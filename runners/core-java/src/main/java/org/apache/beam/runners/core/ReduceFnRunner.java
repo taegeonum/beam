@@ -679,6 +679,8 @@ public class ReduceFnRunner<K, InputT, OutputT, W extends BoundedWindow> {
       return;
     }
 
+    //System.out.println("ONTIMER");
+
     // Create a reusable context for each window and begin prefetching necessary
     // state.
     Map<BoundedWindow, WindowActivation> windowActivations = new HashMap();
@@ -818,6 +820,7 @@ public class ReduceFnRunner<K, InputT, OutputT, W extends BoundedWindow> {
               !cleanupTime.isAfter(BoundedWindow.TIMESTAMP_MAX_VALUE),
               "Cleanup time %s is beyond end-of-time",
               cleanupTime);
+          //System.out.println("SETTIMER");
           directContext.timers().setTimer(cleanupTime, TimeDomain.EVENT_TIME);
         }
       }
@@ -913,6 +916,7 @@ public class ReduceFnRunner<K, InputT, OutputT, W extends BoundedWindow> {
       ReduceFn<K, InputT, OutputT, W>.Context directContext,
       ReduceFn<K, InputT, OutputT, W>.Context renamedContext)
       throws Exception {
+    //System.out.println("EMIT");
     checkState(
         triggerRunner.shouldFire(
             directContext.window(), directContext.timers(), directContext.state()));
@@ -988,6 +992,8 @@ public class ReduceFnRunner<K, InputT, OutputT, W extends BoundedWindow> {
       final boolean isFinished,
       boolean isEndOfWindow)
       throws Exception {
+
+    //System.out.println("ONTRIGGER");
     // Extract the window hold, and as a side effect clear it.
     final WatermarkHold.OldAndNewHolds pair =
         watermarkHold.extractAndRelease(renamedContext, isFinished).read();
@@ -1057,6 +1063,8 @@ public class ReduceFnRunner<K, InputT, OutputT, W extends BoundedWindow> {
                 outputter.outputWindowedValue(KV.of(key, toOutput), outputTimestamp, windows, pane);
               });
 
+
+      //System.out.println("CALL reduceFn.onTrigger");
       reduceFn.onTrigger(renamedTriggerContext);
     }
 

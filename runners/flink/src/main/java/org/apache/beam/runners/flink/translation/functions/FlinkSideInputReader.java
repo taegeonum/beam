@@ -20,9 +20,13 @@ package org.apache.beam.runners.flink.translation.functions;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 import org.apache.beam.runners.core.SideInputReader;
 import org.apache.beam.sdk.transforms.Materializations;
@@ -43,6 +47,11 @@ public class FlinkSideInputReader implements SideInputReader {
 
   private RuntimeContext runtimeContext;
 
+  private final Map<BoundedWindow, Tup> windowMap;
+
+  private boolean started = false;
+  private transient ScheduledExecutorService scheduledExecutorService;
+
   public FlinkSideInputReader(
       Map<PCollectionView<?>, WindowingStrategy<?, ?>> indexByView, RuntimeContext runtimeContext) {
     for (PCollectionView<?> view : indexByView.keySet()) {
@@ -55,6 +64,7 @@ public class FlinkSideInputReader implements SideInputReader {
           view.getViewFn().getMaterialization().getUrn(),
           view.getTagInternal().getId());
     }
+    windowMap = new HashMap<>();
     sideInputs = new HashMap<>();
     for (Map.Entry<PCollectionView<?>, WindowingStrategy<?, ?>> entry : indexByView.entrySet()) {
       sideInputs.put(entry.getKey().getTagInternal(), entry.getValue());
@@ -65,6 +75,16 @@ public class FlinkSideInputReader implements SideInputReader {
   @Nullable
   @Override
   public <T> T get(PCollectionView<T> view, BoundedWindow window) {
+    if (!started) {
+      started = true;
+      scheduledExecutorService = Executors.newScheduledThreadPool(1);
+      scheduledExecutorService.scheduleAtFixedRate(() -> {
+        for (final BoundedWindow w : windowMap.keySet()) {
+          System.out.println("Window " + w + ", latency: " + (windowMap.get(w).end - windowMap.get(w).start));
+        }
+      }, 5, 5, TimeUnit.SECONDS);
+    }
+
     checkNotNull(view, "View passed to sideInput cannot be null");
     TupleTag<?> tag = view.getTagInternal();
     checkNotNull(sideInputs.get(tag), "Side input for " + view + " not available.");
@@ -73,9 +93,18 @@ public class FlinkSideInputReader implements SideInputReader {
         runtimeContext.getBroadcastVariableWithInitializer(
             tag.getId(), new SideInputInitializer<>(view));
     T result = sideInputs.get(window);
+
+    System.out.println(System.currentTimeMillis()  + " Flink get sideinput: " + result);
     if (result == null) {
       ViewFn<MultimapView, T> viewFn = (ViewFn<MultimapView, T>) view.getViewFn();
       result = viewFn.apply(EMPTY_MULTMAP_VIEW);
+    }
+
+    final Tup t = windowMap.get(window);
+    if (t == null) {
+      windowMap.put(window, new Tup(System.currentTimeMillis(), System.currentTimeMillis()));
+    } else {
+      t.end = System.currentTimeMillis();
     }
     return result;
   }
@@ -88,5 +117,14 @@ public class FlinkSideInputReader implements SideInputReader {
   @Override
   public boolean isEmpty() {
     return sideInputs.isEmpty();
+  }
+
+  final class Tup implements Serializable {
+    long end;
+    long start;
+    public Tup(long start, long end) {
+      this.start = start;
+      this.end = end;
+    }
   }
 }

@@ -65,6 +65,8 @@ dependencies {
   shadowTest project(path: ":beam-sdks-java-io-google-cloud-platform", configuration: "shadowTest")
   testCompile library.java.hamcrest_core
   testCompile library.java.hamcrest_library
+  shadow group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.429'
+
 
   gradleRun project(path: project.path, configuration: "shadow")
   gradleRun project(path: nexmarkRunnerDependency, configuration: "shadow")

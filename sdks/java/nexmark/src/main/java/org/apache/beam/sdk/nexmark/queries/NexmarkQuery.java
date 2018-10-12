@@ -22,6 +22,7 @@ import org.apache.beam.sdk.metrics.Metrics;
 import org.apache.beam.sdk.nexmark.Monitor;
 import org.apache.beam.sdk.nexmark.NexmarkConfiguration;
 import org.apache.beam.sdk.nexmark.NexmarkUtils;
+import org.apache.beam.sdk.nexmark.Stamp;
 import org.apache.beam.sdk.nexmark.model.Auction;
 import org.apache.beam.sdk.nexmark.model.Bid;
 import org.apache.beam.sdk.nexmark.model.Event;
@@ -250,6 +251,6 @@ public abstract class NexmarkQuery
     }
 
     // Timestamp the query results.
-    return queryResults.apply(name + ".Stamp", NexmarkUtils.stamp(name));
+    return queryResults.apply(name + ".Stamp", Stamp.stamp(name));
   }
 }

@@ -19,12 +19,16 @@ package org.apache.beam.runners.core;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.coders.IterableCoder;
@@ -40,6 +44,7 @@ import org.apache.beam.sdk.transforms.windowing.BoundedWindow;
 import org.apache.beam.sdk.util.WindowedValue;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollectionView;
+import org.joda.time.Instant;
 
 /**
  * Generic side input handler that uses {@link StateInternals} to store all data. Both the actual
@@ -68,7 +73,10 @@ public class SideInputHandler implements ReadyCheckingSideInputReader {
    * the same view of the state.
    */
   private final StateInternals stateInternals;
+  private transient ScheduledExecutorService scheduledExecutorService;
 
+  private final Map<Instant, Tup> windowMap;
+  private boolean started = false;
   /**
    * A state tag for each side input that we handle. The state is used to track for which windows we
    * have input available.
@@ -91,6 +99,7 @@ public class SideInputHandler implements ReadyCheckingSideInputReader {
     this.stateInternals = stateInternals;
     this.availableWindowsTags = new HashMap<>();
     this.sideInputContentsTags = new HashMap<>();
+    windowMap = new HashMap<>();
 
     for (PCollectionView<?> sideInput : sideInputs) {
       checkArgument(
@@ -152,10 +161,31 @@ public class SideInputHandler implements ReadyCheckingSideInputReader {
     Coder<BoundedWindow> windowCoder =
         (Coder<BoundedWindow>) view.getWindowingStrategyInternal().getWindowFn().windowCoder();
 
+    /*
+    if (!started) {
+      started = true;
+      scheduledExecutorService = Executors.newScheduledThreadPool(1);
+      scheduledExecutorService.scheduleAtFixedRate(() -> {
+        for (final Instant w : windowMap.keySet()) {
+          System.out.println("Window " + w + "-" + this + ", latency: " + (windowMap.get(w).end - windowMap.get(w).start));
+        }
+      }, 5, 5, TimeUnit.SECONDS);
+    }
+    */
+
     StateTag<ValueState<Iterable<?>>> stateTag = sideInputContentsTags.get(view);
 
     ValueState<Iterable<?>> state =
         stateInternals.state(StateNamespaces.window(windowCoder, window), stateTag);
+
+    /*
+    final Tup t = windowMap.get(window.maxTimestamp());
+    if (t == null) {
+      windowMap.put(window.maxTimestamp(), new Tup(System.currentTimeMillis(), System.currentTimeMillis()));
+    } else {
+      t.end = System.currentTimeMillis();
+    }
+    */
 
     // TODO: Add support for choosing which representation is contained based upon the
     // side input materialization. We currently can assume that we always have a multimap
@@ -218,6 +248,15 @@ public class SideInputHandler implements ReadyCheckingSideInputReader {
     @Override
     public Set<BoundedWindow> extractOutput(Set<BoundedWindow> accumulator) {
       return accumulator;
+    }
+  }
+
+  final class Tup implements Serializable {
+    long end;
+    long start;
+    public Tup(long start, long end) {
+      this.start = start;
+      this.end = end;
     }
   }
 }

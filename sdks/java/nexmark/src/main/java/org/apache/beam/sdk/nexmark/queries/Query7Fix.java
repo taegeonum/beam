@@ -46,8 +46,8 @@ import org.joda.time.Duration;
  * side-input in order to exercise that functionality. (A combiner, as used in Query 5, is a more
  * efficient approach.).
  */
-public class Query7 extends NexmarkQuery {
-  public Query7(NexmarkConfiguration configuration) {
+public class Query7Fix extends NexmarkQuery {
+  public Query7Fix(NexmarkConfiguration configuration) {
     super(configuration, "Query7");
   }
 

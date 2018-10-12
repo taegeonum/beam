@@ -346,6 +346,7 @@ public class Combine {
      * not invoke the {@link #mergeAccumulators} operation.
      */
     public OutputT apply(Iterable<? extends InputT> inputs) {
+      //System.out.println(System.currentTimeMillis() + " Combine.aggregate: " + inputs);
       AccumT accum = createAccumulator();
       for (InputT input : inputs) {
         accum = addInput(accum, input);
@@ -2031,6 +2032,9 @@ public class Combine {
                       new DoFn<KV<K, ? extends Iterable<InputT>>, KV<K, OutputT>>() {
                         @ProcessElement
                         public void processElement(final ProcessContext c) {
+                          //System.out.println(System.currentTimeMillis() +
+                          //        " Combine.expand: " + c.element().getValue());
+
                           K key = c.element().getKey();
 
                           OutputT output;

@@ -474,6 +474,10 @@ public class DoFnOperator<InputT, OutputT> extends AbstractStreamOperator<Window
     // make a view available that was previously not ready.
     // The PushbackSideInputRunner will only reset it's cache of non-ready windows when
     // finishing a bundle.
+    System.out.println("Receive side input: " + streamRecord.getValue().toString());
+
+    final long st = System.currentTimeMillis();
+
     invokeFinishBundle();
     checkInvokeStartBundle();
 
@@ -488,6 +492,7 @@ public class DoFnOperator<InputT, OutputT> extends AbstractStreamOperator<Window
 
     Iterator<WindowedValue<InputT>> it = pushedBackElementsHandler.getElements().iterator();
 
+    int cnt = 0;
     while (it.hasNext()) {
       WindowedValue<InputT> element = it.next();
       // we need to set the correct key in case the operator is
@@ -496,6 +501,7 @@ public class DoFnOperator<InputT, OutputT> extends AbstractStreamOperator<Window
 
       Iterable<WindowedValue<InputT>> justPushedBack =
           pushbackDoFnRunner.processElementInReadyWindows(element);
+      cnt += 1;
       Iterables.addAll(newPushedBack, justPushedBack);
     }
 
@@ -511,6 +517,8 @@ public class DoFnOperator<InputT, OutputT> extends AbstractStreamOperator<Window
 
     // maybe output a new watermark
     processWatermark1(new Watermark(currentInputWatermark));
+
+    System.out.println("Side input processing latency: " + (System.currentTimeMillis() - st) + ", # of processed cnt: " + cnt);
   }
 
   @Override

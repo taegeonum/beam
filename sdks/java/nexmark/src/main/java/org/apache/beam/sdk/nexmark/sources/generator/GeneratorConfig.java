@@ -23,10 +23,12 @@ import java.util.List;
 import org.apache.beam.sdk.nexmark.NexmarkConfiguration;
 import org.apache.beam.sdk.nexmark.model.Event;
 import org.apache.beam.sdk.values.KV;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Parameters controlling how {@link Generator} synthesizes {@link Event} elements. */
 public class GeneratorConfig implements Serializable {
-
+  private static final Logger LOG = LoggerFactory.getLogger(Generator.class);
   /**
    * We start the ids at specific values to help ensure the queries find a match even on small
    * synthesized dataset sizes.
@@ -124,6 +126,7 @@ public class GeneratorConfig implements Serializable {
     }
     this.eventsPerEpoch = eventsPerEpoch;
     this.epochPeriodMs = epochPeriodMs;
+    LOG.info("RatePeriod: {}, epochPeriodMs: {}, stepLengthSec: {}", configuration.ratePeriodSec, epochPeriodMs, stepLengthSec);
   }
 
   /** Return a copy of this config. */

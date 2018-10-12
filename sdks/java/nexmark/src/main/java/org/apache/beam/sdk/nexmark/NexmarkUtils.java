@@ -213,10 +213,13 @@ public class NexmarkUtils {
   /** Shape of event rate. */
   public enum RateShape {
     SQUARE,
-    SINE;
+    SINE,
+    BURSTY;
 
     /** Number of steps used to approximate sine wave. */
     private static final int N = 10;
+
+    private static final int BURSTY_N = 5;
 
     /**
      * Return inter-event delay, in microseconds, for each generator to follow in order to achieve
@@ -240,24 +243,43 @@ public class NexmarkUtils {
 
       switch (this) {
         case SQUARE:
-          {
-            long[] interEventDelayUs = new long[2];
-            interEventDelayUs[0] = unit.rateToPeriodUs(firstRate) * numGenerators;
-            interEventDelayUs[1] = unit.rateToPeriodUs(nextRate) * numGenerators;
-            return interEventDelayUs;
-          }
+        {
+          long[] interEventDelayUs = new long[2];
+          interEventDelayUs[0] = unit.rateToPeriodUs(firstRate) * numGenerators;
+          interEventDelayUs[1] = unit.rateToPeriodUs(nextRate) * numGenerators;
+          return interEventDelayUs;
+        }
         case SINE:
-          {
-            double mid = (firstRate + nextRate) / 2.0;
-            double amp = (firstRate - nextRate) / 2.0; // may be -ve
-            long[] interEventDelayUs = new long[N];
-            for (int i = 0; i < N; i++) {
-              double r = (2.0 * Math.PI * i) / N;
-              double rate = mid + amp * Math.cos(r);
-              interEventDelayUs[i] = unit.rateToPeriodUs(Math.round(rate)) * numGenerators;
-            }
-            return interEventDelayUs;
+        {
+          double mid = (firstRate + nextRate) / 2.0;
+          double amp = (firstRate - nextRate) / 2.0; // may be -ve
+          long[] interEventDelayUs = new long[N];
+          for (int i = 0; i < N; i++) {
+            double r = (2.0 * Math.PI * i) / N;
+            double rate = mid + amp * Math.cos(r);
+            interEventDelayUs[i] = unit.rateToPeriodUs(Math.round(rate)) * numGenerators;
+            LOG.info("firstRate: {}, nextRate: {}, r: {}, rate: {}, interEventDelayUs[{}]: {}",
+                    firstRate, nextRate, r, rate, i, interEventDelayUs[i]);
           }
+
+          LOG.info("firstRate: {}, nextRate: {}, interEventDelayUs: {}", interEventDelayUs);
+          return interEventDelayUs;
+        }
+        case BURSTY:
+        {
+
+          final long normalDelayUs = unit.rateToPeriodUs(firstRate) * numGenerators;
+          final long burstyDelayUS = unit.rateToPeriodUs(nextRate) * numGenerators;
+          long[] interEventDelayUs = new long[BURSTY_N];
+          for (int i = 0; i < BURSTY_N; i++) {
+            interEventDelayUs[i] = normalDelayUs;
+          }
+
+          interEventDelayUs[BURSTY_N - 1] = burstyDelayUS;
+
+          LOG.info("Normal delay: {}, Bursty delay: {}", normalDelayUs, burstyDelayUS);
+          return interEventDelayUs;
+        }
       }
       throw new RuntimeException(); // switch should be exhaustive
     }
@@ -274,6 +296,9 @@ public class NexmarkUtils {
           break;
         case SINE:
           n = N;
+          break;
+        case BURSTY:
+          n = BURSTY_N;
           break;
       }
       return (ratePeriodSec + n - 1) / n;
@@ -451,17 +476,6 @@ public class NexmarkUtils {
           public void processElement(ProcessContext c) {
             recordCounterMetric.inc();
             c.output(c.element().toString());
-          }
-        });
-  }
-
-  /** Return a transform to make explicit the timestamp of each element. */
-  public static <T> ParDo.SingleOutput<T, TimestampedValue<T>> stamp(String name) {
-    return ParDo.of(
-        new DoFn<T, TimestampedValue<T>>() {
-          @ProcessElement
-          public void processElement(ProcessContext c) {
-            c.output(TimestampedValue.of(c.element(), c.timestamp()));
           }
         });
   }

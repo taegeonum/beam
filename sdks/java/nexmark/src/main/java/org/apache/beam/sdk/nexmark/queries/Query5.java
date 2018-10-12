@@ -76,6 +76,9 @@ public class Query5 extends NexmarkQuery {
         // Start by lifting each into a singleton list.
         // need to do so because bellow combine returns a list of auctions in the key in case of
         // equal number of bids. Combine needs to have same input type and return type.
+
+            //.apply(new MyPerElement<>())
+
         .apply(
             name + ".ToSingletons",
             ParDo.of(
@@ -88,6 +91,7 @@ public class Query5 extends NexmarkQuery {
                             c.element().getValue()));
                   }
                 }))
+
 
         // Keep only the auction ids with the most bids.
         .apply(

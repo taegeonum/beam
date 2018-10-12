@@ -56,7 +56,7 @@ class BeamModulePlugin implements Plugin<Project> {
     double javaVersion = 1.8
 
     /** Controls whether the findbugs plugin is enabled and configured. */
-    boolean enableFindbugs = true
+    boolean enableFindbugs = false
 
     /**
      * List of additional lint warnings to disable.
@@ -536,9 +536,9 @@ class BeamModulePlugin implements Plugin<Project> {
           '-parameters',
           '-Xlint:all',
           '-Werror',
-          '-XepDisableWarningsInGeneratedCode',
-          '-XepExcludedPaths:(.*/)?(build/generated.*avro-java|build/generated)/.*',
-          '-Xep:MutableConstantField:OFF' // Guava's immutable collections cannot appear on API surface.
+          //'-XepDisableWarningsInGeneratedCode',
+          //'-XepExcludedPaths:(.*/)?(build/generated.*avro-java|build/generated)/.*',
+          //'-Xep:MutableConstantField:OFF' // Guava's immutable collections cannot appear on API surface.
         ]
         + (defaultLintSuppressions + configuration.disableLintWarnings).collect { "-Xlint:-${it}" })
       }
@@ -604,14 +604,18 @@ class BeamModulePlugin implements Plugin<Project> {
 
       // Configures a checkstyle plugin enforcing a set of rules and also allows for a set of
       // suppressions.
-      project.apply plugin: 'checkstyle'
-      project.tasks.withType(Checkstyle) {
+      //project.apply plugin: 'checkstyle'
+      /*project.tasks.withType(Checkstyle) {
         configFile = project.project(":").file("sdks/java/build-tools/src/main/resources/beam/checkstyle.xml")
         configProperties = ["checkstyle.suppressions.file": project.project(":").file("sdks/java/build-tools/src/main/resources/beam/suppressions.xml")]
         showViolations = true
         maxErrors = 0
       }
       project.checkstyle { toolVersion = "8.7" }
+
+      // Ensure check runs javadoc
+      project.check.dependsOn project.javadoc
+      */
 
       // Apply the eclipse and apt-eclipse plugins.  This adds the "eclipse" task and
       // connects the apt-eclipse plugin to update the eclipse project files
@@ -622,8 +626,8 @@ class BeamModulePlugin implements Plugin<Project> {
 
       // Enables a plugin which can apply code formatting to source.
       // TODO(https://issues.apache.org/jira/browse/BEAM-4394): Should this plugin be enabled for all projects?
-      project.apply plugin: "com.diffplug.gradle.spotless"
-      project.spotless { java { googleJavaFormat() } }
+      //project.apply plugin: "com.diffplug.gradle.spotless"
+      //project.spotless { java { googleJavaFormat() } }
 
       // Enables a plugin which performs code analysis for common bugs.
       // This plugin is configured to only analyze the "main" source set.
@@ -642,7 +646,7 @@ class BeamModulePlugin implements Plugin<Project> {
       }
 
       // Enable errorprone static analysis
-      project.apply plugin: 'net.ltgt.errorprone'
+      //project.apply plugin: 'net.ltgt.errorprone'
 
       // Enables a plugin which can perform shading of classes. See the general comments
       // above about dependency management for Java projects and how the shadow plugin

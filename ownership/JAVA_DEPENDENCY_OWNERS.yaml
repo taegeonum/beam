@@ -104,10 +104,6 @@ deps:
     artifact: cassandra-driver-mapping
     owners:
 
-  com.diffplug.spotless:spotless-plugin-gradle:
-    group: com.diffplug.spotless
-    artifact: spotless-plugin-gradle
-    owners:
 
   com.esotericsoftware.kryo:kryo:
     group: com.esotericsoftware.kryo

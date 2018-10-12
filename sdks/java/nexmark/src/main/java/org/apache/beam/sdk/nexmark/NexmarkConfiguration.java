@@ -103,13 +103,13 @@ public class NexmarkConfiguration implements Serializable {
   @JsonProperty public boolean useWallclockEventTime = false;
 
   /** Average idealized size of a 'new person' event, in bytes. */
-  @JsonProperty public int avgPersonByteSize = 200;
+  @JsonProperty public int avgPersonByteSize = 100;
 
   /** Average idealized size of a 'new auction' event, in bytes. */
-  @JsonProperty public int avgAuctionByteSize = 500;
+  @JsonProperty public int avgAuctionByteSize = 250;
 
   /** Average idealized size of a 'bid' event, in bytes. */
-  @JsonProperty public int avgBidByteSize = 100;
+  @JsonProperty public int avgBidByteSize = 50;
 
   /** Ratio of bids to 'hot' auctions compared to all other auctions. */
   @JsonProperty public int hotAuctionRatio = 2;

@@ -315,6 +315,7 @@ public class FlinkStateInternals<K> implements StateInternals {
                     .getPartitionedState(
                         namespace.stringKey(), StringSerializer.INSTANCE, flinkStateDescriptor)
                     .get();
+            //System.out.println("BagState read: " + result);
             return result == null;
           } catch (Exception e) {
             throw new RuntimeException("Error reading state.", e);
@@ -399,6 +400,7 @@ public class FlinkStateInternals<K> implements StateInternals {
             flinkStateBackend.getPartitionedState(
                 namespace.stringKey(), StringSerializer.INSTANCE, flinkStateDescriptor);
 
+        //System.out.println(this + "\tFlink state internal add: "+ value);
         AccumT current = state.value();
         if (current == null) {
           current = combineFn.createAccumulator();
@@ -448,6 +450,7 @@ public class FlinkStateInternals<K> implements StateInternals {
 
     @Override
     public OutputT read() {
+      //System.out.println(System.currentTimeMillis() + "\t" + this + "\t" + "read");
       try {
         org.apache.flink.api.common.state.ValueState<AccumT> state =
             flinkStateBackend.getPartitionedState(
@@ -960,6 +963,7 @@ public class FlinkStateInternals<K> implements StateInternals {
                     .getPartitionedState(
                         namespace.stringKey(), StringSerializer.INSTANCE, flinkStateDescriptor)
                     .entries();
+            //System.out.println("MapState: " + result);
             return result != null ? ImmutableList.copyOf(result) : Collections.emptyList();
           } catch (Exception e) {
             throw new RuntimeException("Error get map state entries.", e);

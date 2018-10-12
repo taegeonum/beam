@@ -120,10 +120,15 @@ public class WindowDoFnOperator<K, InputT, OutputT>
 
   @Override
   public void fireTimer(InternalTimer<?, TimerData> timer) {
+    //final StringBuilder sb = new StringBuilder("TIMER\t");
+    //sb.append(System.currentTimeMillis());
     doFnRunner.processElement(
         WindowedValue.valueInGlobalWindow(
             KeyedWorkItems.timersWorkItem(
                 (K) keyedStateInternals.getKey(),
                 Collections.singletonList(timer.getNamespace()))));
+    //sb.append("\t");
+    //sb.append(System.currentTimeMillis());
+    //System.out.println(sb.toString());
   }
 }

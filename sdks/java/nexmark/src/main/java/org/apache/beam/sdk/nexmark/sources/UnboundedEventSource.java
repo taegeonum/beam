@@ -154,6 +154,7 @@ public class UnboundedEventSource extends UnboundedSource<Event, GeneratorCheckp
         }
 
         Generator.NextEvent next = heldBackEvents.peek();
+        //LOG.info("HeldBackEvent peek: {}", next);
         if (next != null && next.wallclockTimestamp <= now) {
           // Time to use the held-back event.
           heldBackEvents.poll();
@@ -161,20 +162,24 @@ public class UnboundedEventSource extends UnboundedSource<Event, GeneratorCheckp
               "replaying held-back event {}ms behind watermark", watermark - next.eventTimestamp);
         } else if (generator.hasNext()) {
           next = generator.nextEvent();
+          //LOG.info("Generator.nextEvent(): {}", next);
           if (isRateLimited
               && config.getProbDelayedEvent() > 0.0
               && config.getOccasionalDelaySec() > 0
               && ThreadLocalRandom.current().nextDouble() < config.getProbDelayedEvent()) {
             // We'll hold back this event and go around again.
+            //LOG.info("isRateLimited && config.geProbm... && config.getOccasional");
             long delayMs =
                 ThreadLocalRandom.current().nextLong(config.getOccasionalDelaySec() * 1000) + 1L;
             LOG.debug("delaying event by {}ms", delayMs);
+            //LOG.info("Heldback add with delay {}", delayMs);
             heldBackEvents.add(next.withDelay(delayMs));
             continue;
           }
         } else {
           // Waiting for held-back event to fire.
           if (isRateLimited) {
+            //LOG.info("Generator.nextEvent() false and isRateLimited: true");
             updateBacklog(now, 0);
           }
           return false;
@@ -187,7 +192,11 @@ public class UnboundedEventSource extends UnboundedSource<Event, GeneratorCheckp
         if (newWatermark > watermark) {
           watermark = newWatermark;
         }
+
       }
+
+      //LOG.info("isRateLimited: {}, pendingEventWallclockTime: {}, now: {}, pendingEvent: {}, newWatermark: {}, watermarkHoldbackSec: {}",
+      //        isRateLimited, pendingEventWallclockTime, now, pendingEvent, watermark, watermarkHoldbackSec);
 
       if (isRateLimited) {
         if (pendingEventWallclockTime > now) {
@@ -195,6 +204,7 @@ public class UnboundedEventSource extends UnboundedSource<Event, GeneratorCheckp
           updateBacklog(now, 0);
           return false;
         }
+
         updateBacklog(now, now - pendingEventWallclockTime);
       }
 
@@ -207,9 +217,12 @@ public class UnboundedEventSource extends UnboundedSource<Event, GeneratorCheckp
     private void updateBacklog(long now, long newBacklogDurationMs) {
       backlogDurationMs = newBacklogDurationMs;
       long interEventDelayUs = generator.currentInterEventDelayUs();
+      //LOG.info("Update backlog: now {}, newBacklogDuration: {}, interEventDelayUs: {}",
+      //        now, newBacklogDurationMs, interEventDelayUs);
       if (interEventDelayUs != 0) {
         long backlogEvents = (backlogDurationMs * 1000 + interEventDelayUs - 1) / interEventDelayUs;
         backlogBytes = generator.getCurrentConfig().estimatedBytesForEvents(backlogEvents);
+        //LOG.info("backlog bytes: {}", backlogBytes);
       }
       if (lastReportedBacklogWallclock < 0
           || now - lastReportedBacklogWallclock > BACKLOG_PERIOD.getMillis()) {

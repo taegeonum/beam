@@ -28,8 +28,11 @@ import java.util.Objects;
 import java.util.Random;
 import org.apache.beam.sdk.nexmark.model.Bid;
 import org.apache.beam.sdk.nexmark.model.Event;
+import org.apache.beam.sdk.nexmark.sources.UnboundedEventSource;
 import org.apache.beam.sdk.values.TimestampedValue;
 import org.joda.time.Instant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A generator for synthetic events. We try to make the data vaguely reasonable. We also ensure most
@@ -45,6 +48,7 @@ import org.joda.time.Instant;
  * can resume generating events from a saved snapshot.
  */
 public class Generator implements Iterator<TimestampedValue<Event>>, Serializable {
+  private static final Logger LOG = LoggerFactory.getLogger(Generator.class);
 
   /**
    * The next event and its various timestamps. Ordered by increasing wallclock timestamp, then
@@ -60,7 +64,7 @@ public class Generator implements Iterator<TimestampedValue<Event>>, Serializabl
     /** The event itself. */
     public final Event event;
 
-    /** The minimum of this and all future event timestamps. */
+    /** The minimum of this and all future event tiwallclockTimestampmestamps. */
     public final long watermark;
 
     public NextEvent(long wallclockTimestamp, long eventTimestamp, Event event, long watermark) {
@@ -194,9 +198,10 @@ public class Generator implements Iterator<TimestampedValue<Event>>, Serializabl
       wallclockBaseTime = System.currentTimeMillis();
     }
     // When, in event time, we should generate the event. Monotonic.
+    final long nextEventNumber = config.nextEventNumber(eventsCountSoFar);
     long eventTimestamp =
         config
-            .timestampAndInterEventDelayUsForEvent(config.nextEventNumber(eventsCountSoFar))
+            .timestampAndInterEventDelayUsForEvent(nextEventNumber)
             .getKey();
     // When, in event time, the event should say it was generated. Depending on outOfOrderGroupSize
     // may have local jitter.
@@ -212,7 +217,14 @@ public class Generator implements Iterator<TimestampedValue<Event>>, Serializabl
                 config.nextEventNumberForWatermark(eventsCountSoFar))
             .getKey();
     // When, in wallclock time, we should emit the event.
+
     long wallclockTimestamp = wallclockBaseTime + (eventTimestamp - getCurrentConfig().baseTime);
+    /*
+    LOG.info("Nexevent wallclockTimestamp: {}, wallclockBaseTime: {}, eventTimestamp: {}, baseTime: {}," +
+                    "nextEventNumber: {}, eventsCountSoFar: {}",
+            wallclockTimestamp, wallclockBaseTime, eventTimestamp, getCurrentConfig().baseTime,
+            nextEventNumber, eventsCountSoFar);
+            */
 
     // Seed the random number generator with the next 'event id'.
     Random random = new Random(getNextEventId());

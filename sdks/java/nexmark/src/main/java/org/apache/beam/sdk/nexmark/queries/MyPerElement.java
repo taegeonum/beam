@@ -1,6 +1,9 @@
-package org.apache.beam.sdk.nexmark.queries.custom;
+package org.apache.beam.sdk.nexmark.queries;
 
-import org.apache.beam.sdk.transforms.*;
+import org.apache.beam.sdk.transforms.Combine;
+import org.apache.beam.sdk.transforms.MapElements;
+import org.apache.beam.sdk.transforms.PTransform;
+import org.apache.beam.sdk.transforms.SimpleFunction;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 
@@ -12,6 +15,7 @@ import org.apache.beam.sdk.values.PCollection;
 public final class MyPerElement<T> extends PTransform<PCollection<T>, PCollection<KV<T, Long>>> {
 
     public MyPerElement() {
+
     }
 
     @Override

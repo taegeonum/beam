@@ -1,4 +1,4 @@
-package org.apache.beam.sdk.nexmark.queries.custom;
+package org.apache.beam.sdk.nexmark.queries;
 
 import org.apache.beam.sdk.coders.AtomicCoder;
 import org.apache.beam.sdk.coders.Coder;

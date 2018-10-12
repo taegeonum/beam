@@ -25,6 +25,7 @@ import org.apache.beam.sdk.nexmark.NexmarkUtils;
 import org.apache.beam.sdk.nexmark.model.AuctionCount;
 import org.apache.beam.sdk.nexmark.model.Event;
 import org.apache.beam.sdk.nexmark.model.KnownSize;
+import org.apache.beam.sdk.nexmark.queries.custom.MyPerElement;
 import org.apache.beam.sdk.transforms.Combine;
 import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.transforms.DoFn;
@@ -70,7 +71,7 @@ public class Query5 extends NexmarkQuery {
         .apply("BidToAuction", BID_TO_AUCTION)
 
         // Count the number of bids per auction id.
-        .apply(Count.perElement())
+        .apply(new MyPerElement<>())
 
         // We'll want to keep all auctions with the maximal number of bids.
         // Start by lifting each into a singleton list.

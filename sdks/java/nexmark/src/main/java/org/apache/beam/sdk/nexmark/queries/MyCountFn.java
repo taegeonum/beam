@@ -47,7 +47,7 @@ public final class MyCountFn<T> extends Combine.CombineFn<T, long[], Long> {
     while (iter.hasNext()) {
       running[0] += iter.next()[0];
     }
-     System.out.println("### Merging time: " + System.currentTimeMillis() + ", result: " + running);
+    System.out.println("### Merging time: " + System.currentTimeMillis() + ", result: " + running);
     return running;
   }
    @Override

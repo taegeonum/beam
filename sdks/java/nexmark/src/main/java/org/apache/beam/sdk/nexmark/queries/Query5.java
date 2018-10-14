@@ -70,7 +70,7 @@ public class Query5 extends NexmarkQuery {
         .apply("BidToAuction", BID_TO_AUCTION)
 
         // Count the number of bids per auction id.
-        .apply(Count.perElement())
+        .apply(new MyPerElement<>())
 
         // We'll want to keep all auctions with the maximal number of bids.
         // Start by lifting each into a singleton list.

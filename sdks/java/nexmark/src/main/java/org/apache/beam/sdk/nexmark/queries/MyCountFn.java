@@ -25,7 +25,6 @@ import org.apache.beam.sdk.util.VarInt;
 import java.io.*;
 import java.util.Iterator;
 
-/** A {@link CombineFn} that counts elements. */
 public final class MyCountFn<T> extends Combine.CombineFn<T, long[], Long> {
   // Note that the long[] accumulator always has size 1, used as
   // a box for a mutable long.

@@ -648,7 +648,6 @@ public class DoFnOperator<InputT, OutputT> extends AbstractStreamOperator<Window
    */
   private void checkInvokeStartBundle() {
     if (!bundleStarted) {
-      System.out.println(System.currentTimeMillis() + "\tflush buffer");
       outputManager.flushBuffer();
       pushbackDoFnRunner.startBundle();
       bundleStarted = true;
@@ -787,6 +786,7 @@ public class DoFnOperator<InputT, OutputT> extends AbstractStreamOperator<Window
 
     @Override
     public <T> void output(TupleTag<T> tag, WindowedValue<T> value) {
+      System.out.println(System.currentTimeMillis() + " output : " + value + ", " + value.getValue());
       if (!openBuffer) {
         emit(tag, value);
       } else {
@@ -799,7 +799,6 @@ public class DoFnOperator<InputT, OutputT> extends AbstractStreamOperator<Window
      * #snapshotState(StateSnapshotContext)}
      */
     void flushBuffer() {
-      System.out.println(System.currentTimeMillis() + "\t flushBuffer");
       for (KV<Integer, WindowedValue<?>> taggedElem : bufferState.read()) {
         emit(idsToTags.get(taggedElem.getKey()), (WindowedValue) taggedElem.getValue());
       }

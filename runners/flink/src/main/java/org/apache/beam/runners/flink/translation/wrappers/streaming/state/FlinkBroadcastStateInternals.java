@@ -447,6 +447,7 @@ public class FlinkBroadcastStateInternals<K> implements StateInternals {
       if (current == null) {
         current = combineFn.createAccumulator();
       }
+      System.out.println("FlinkBroadcastStateInternals.FlinkCombiningState");
       current = combineFn.addInput(current, value);
       writeInternal(current);
     }
@@ -564,6 +565,7 @@ public class FlinkBroadcastStateInternals<K> implements StateInternals {
         if (current == null) {
           current = combineFn.createAccumulator();
         }
+        System.out.println("FlinkBroadcastStateInternals.FlinkKeyedCombiningState");
         current = combineFn.addInput(current, value);
         writeInternal(current);
       } catch (Exception e) {

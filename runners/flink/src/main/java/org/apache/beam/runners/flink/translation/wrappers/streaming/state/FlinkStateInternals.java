@@ -403,6 +403,7 @@ public class FlinkStateInternals<K> implements StateInternals {
         if (current == null) {
           current = combineFn.createAccumulator();
         }
+        System.out.println("FlinkStateInternals addInput");
         current = combineFn.addInput(current, value);
         state.update(current);
       } catch (Exception e) {

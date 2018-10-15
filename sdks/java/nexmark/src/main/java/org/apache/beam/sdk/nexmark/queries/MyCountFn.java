@@ -30,11 +30,13 @@ public final class MyCountFn<T> extends Combine.CombineFn<T, long[], Long> {
   // a box for a mutable long.
    @Override
   public long[] createAccumulator() {
+     System.out.println("### Create accumulator");
     return new long[] {0};
   }
    @Override
   public long[] addInput(long[] accumulator, T input) {
-    accumulator[0] += 1;
+     System.out.println("### Add input: " + input);
+     accumulator[0] += 1;
     return accumulator;
   }
    @Override

@@ -19,10 +19,9 @@ public final class MyPerElement<T> extends PTransform<PCollection<T>, PCollectio
                                 new SimpleFunction<T, KV<T, Void>>() {
                                     @Override
                                     public KV<T, Void> apply(T element) {
-                                        System.out.println("hello: " + element);
                                         return KV.of(element, (Void) null);
                                     }
                                 }))
                 .apply(Combine.perKey(new MyCountFn<>()));
     }
-} 
+}

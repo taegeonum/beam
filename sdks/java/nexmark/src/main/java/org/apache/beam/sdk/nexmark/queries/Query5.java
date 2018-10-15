@@ -71,18 +71,7 @@ public class Query5 extends NexmarkQuery {
 
         // Count the number of bids per auction id.
         .apply(new MyPerElement<>())
-        .apply(
-                name + ".ToSingletons",
-                ParDo.of(
-                        new DoFn<KV<Long, Long>, AuctionCount>() {
-                            @ProcessElement
-                            public void processElement(ProcessContext c) {
-                                c.output(new AuctionCount(c.element().getKey(), c.element().getValue()));
-                            }
-                        }));
 
-
-      /*
         // We'll want to keep all auctions with the maximal number of bids.
         // Start by lifting each into a singleton list.
         // need to do so because bellow combine returns a list of auctions in the key in case of
@@ -93,8 +82,8 @@ public class Query5 extends NexmarkQuery {
                 new DoFn<KV<Long, Long>, KV<List<Long>, Long>>() {
                   @ProcessElement
                   public void processElement(ProcessContext c) {
-                      System.out.println(System.currentTimeMillis() + "\tToSingleton: " + c.element().getKey()
-                              + ": " + c.element().getValue());
+                      //System.out.println(System.currentTimeMillis() + "\tToSingleton: " + c.element().getKey()
+                      //        + ": " + c.element().getValue());
                     c.output(
                         KV.of(
                             Collections.singletonList(c.element().getKey()),
@@ -136,15 +125,14 @@ public class Query5 extends NexmarkQuery {
                 new DoFn<KV<List<Long>, Long>, AuctionCount>() {
                   @ProcessElement
                   public void processElement(ProcessContext c) {
-                      System.out.println(System.currentTimeMillis()+
-                              "\tAfterSelection: (" + c.element().getKey() + ", " + c.element().getValue() + ")");
+                      //System.out.println(System.currentTimeMillis()+
+                      //        "\tAfterSelection: (" + c.element().getKey() + ", " + c.element().getValue() + ")");
                     long count = c.element().getValue();
                     for (long auction : c.element().getKey()) {
                       c.output(new AuctionCount(auction, count));
                     }
                   }
                 }));
-                */
   }
 
   @Override

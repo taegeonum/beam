@@ -583,7 +583,6 @@ public class DoFnOperator<InputT, OutputT> extends AbstractStreamOperator<Window
   private void emitWatermark(long watermark) {
     // Must invoke finishBatch before emit the +Inf watermark otherwise there are some late events.
     if (watermark >= BoundedWindow.TIMESTAMP_MAX_VALUE.getMillis()) {
-      System.out.println(System.currentTimeMillis() + "\temit watermark " + watermark);
       invokeFinishBundle();
     }
     output.emitWatermark(new Watermark(watermark));
@@ -787,10 +786,8 @@ public class DoFnOperator<InputT, OutputT> extends AbstractStreamOperator<Window
     @Override
     public <T> void output(TupleTag<T> tag, WindowedValue<T> value) {
       if (!openBuffer) {
-        System.out.println(System.currentTimeMillis() + " !!output : " + value);
         emit(tag, value);
       } else {
-        System.out.println(System.currentTimeMillis() + " output : " + value);
         bufferState.add(KV.of(tagsToIds.get(tag), value));
       }
     }

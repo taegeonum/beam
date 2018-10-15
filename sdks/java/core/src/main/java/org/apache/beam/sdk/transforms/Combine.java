@@ -346,6 +346,7 @@ public class Combine {
      * not invoke the {@link #mergeAccumulators} operation.
      */
     public OutputT apply(Iterable<? extends InputT> inputs) {
+      System.out.println(System.currentTimeMillis() + " Combine.aggregate: " + inputs);
       AccumT accum = createAccumulator();
       for (InputT input : inputs) {
         accum = addInput(accum, input);

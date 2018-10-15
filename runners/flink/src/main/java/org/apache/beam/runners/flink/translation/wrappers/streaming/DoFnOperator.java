@@ -788,6 +788,7 @@ public class DoFnOperator<InputT, OutputT> extends AbstractStreamOperator<Window
       if (!openBuffer) {
         emit(tag, value);
       } else {
+        System.out.println("Buffered output manager output: "+ value);
         bufferState.add(KV.of(tagsToIds.get(tag), value));
       }
     }

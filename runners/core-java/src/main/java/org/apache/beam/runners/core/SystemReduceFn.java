@@ -122,6 +122,7 @@ public abstract class SystemReduceFn<K, InputT, AccumT, OutputT, W extends Bound
 
   @Override
   public void onTrigger(OnTriggerContext c) throws Exception {
+    System.out.println(System.currentTimeMillis() + "\t" + this + "System reduce fn onTrigger");
     c.output(c.state().access(bufferTag).read());
   }
 

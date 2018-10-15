@@ -71,7 +71,17 @@ public class Query5 extends NexmarkQuery {
 
         // Count the number of bids per auction id.
         .apply(new MyPerElement<>())
+        .apply(
+                name + ".ToSingletons",
+                ParDo.of(
+                        new DoFn<KV<Long, Long>, AuctionCount>() {
+                            @ProcessElement
+                            public void processElement(ProcessContext c) {
+                                c.output(new AuctionCount(c.element().getKey(), c.element().getValue()));
+                            }
+                        }));
 
+    /*
         // We'll want to keep all auctions with the maximal number of bids.
         // Start by lifting each into a singleton list.
         // need to do so because bellow combine returns a list of auctions in the key in case of
@@ -133,6 +143,7 @@ public class Query5 extends NexmarkQuery {
                     }
                   }
                 }));
+                */
   }
 
   @Override

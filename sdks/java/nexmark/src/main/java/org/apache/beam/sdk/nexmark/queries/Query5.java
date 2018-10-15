@@ -93,6 +93,7 @@ public class Query5 extends NexmarkQuery {
 
         // Keep only the auction ids with the most bids.
         .apply(
+                "Globally-Combining!",
             Combine.globally(
                     new Combine.BinaryCombineFn<KV<List<Long>, Long>>() {
                       @Override
@@ -124,6 +125,8 @@ public class Query5 extends NexmarkQuery {
                 new DoFn<KV<List<Long>, Long>, AuctionCount>() {
                   @ProcessElement
                   public void processElement(ProcessContext c) {
+                      System.out.println(System.currentTimeMillis()+
+                              "\tAfterSelection: (" + c.element().getKey() + ", " + c.element().getValue() + ")");
                     long count = c.element().getValue();
                     for (long auction : c.element().getKey()) {
                       c.output(new AuctionCount(auction, count));

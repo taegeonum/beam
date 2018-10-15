@@ -399,7 +399,7 @@ public class FlinkStateInternals<K> implements StateInternals {
             flinkStateBackend.getPartitionedState(
                 namespace.stringKey(), StringSerializer.INSTANCE, flinkStateDescriptor);
 
-        System.out.println("Flink state internal add: "+ value);
+        System.out.println(this + "\tFlink state internal add: "+ value);
         AccumT current = state.value();
         if (current == null) {
           current = combineFn.createAccumulator();
@@ -449,6 +449,7 @@ public class FlinkStateInternals<K> implements StateInternals {
 
     @Override
     public OutputT read() {
+      System.out.println(System.currentTimeMillis() + "\t" + this + "\t" + "read");
       try {
         org.apache.flink.api.common.state.ValueState<AccumT> state =
             flinkStateBackend.getPartitionedState(

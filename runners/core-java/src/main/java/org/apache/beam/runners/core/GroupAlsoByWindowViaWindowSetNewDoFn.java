@@ -133,7 +133,7 @@ public class GroupAlsoByWindowViaWindowSetNewDoFn<
             reduceFn,
             c.getPipelineOptions());
 
-    System.out.println("GBKW processElement: " + keyedWorkItem.elementsIterable() + "\t" + keyedWorkItem.timersIterable());
+    //System.out.println("GBKW processElement: " + keyedWorkItem.elementsIterable() + "\t" + keyedWorkItem.timersIterable());
 
     reduceFnRunner.processElements(keyedWorkItem.elementsIterable());
     reduceFnRunner.onTimers(keyedWorkItem.timersIterable());

@@ -449,7 +449,7 @@ public class FlinkStateInternals<K> implements StateInternals {
 
     @Override
     public OutputT read() {
-      System.out.println(System.currentTimeMillis() + "\t" + this + "\t" + "read");
+      //System.out.println(System.currentTimeMillis() + "\t" + this + "\t" + "read");
       try {
         org.apache.flink.api.common.state.ValueState<AccumT> state =
             flinkStateBackend.getPartitionedState(

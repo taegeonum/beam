@@ -787,9 +787,10 @@ public class DoFnOperator<InputT, OutputT> extends AbstractStreamOperator<Window
     @Override
     public <T> void output(TupleTag<T> tag, WindowedValue<T> value) {
       if (!openBuffer) {
+        System.out.println(System.currentTimeMillis() + " !!output : " + value);
         emit(tag, value);
       } else {
-        System.out.println(System.currentTimeMillis() + " pane : " + value.getPane() + ", " + value.getValue());
+        System.out.println(System.currentTimeMillis() + " output : " + value);
         bufferState.add(KV.of(tagsToIds.get(tag), value));
       }
     }

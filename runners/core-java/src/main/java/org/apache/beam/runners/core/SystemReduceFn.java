@@ -112,6 +112,7 @@ public abstract class SystemReduceFn<K, InputT, AccumT, OutputT, W extends Bound
 
   @Override
   public void processValue(ProcessValueContext c) throws Exception {
+    System.out.println("system reduce function");
     c.state().access(bufferTag).add(c.value());
   }
 

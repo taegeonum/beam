@@ -788,7 +788,6 @@ public class DoFnOperator<InputT, OutputT> extends AbstractStreamOperator<Window
       if (!openBuffer) {
         emit(tag, value);
       } else {
-        System.out.println("Buffered output manager output: "+ value);
         bufferState.add(KV.of(tagsToIds.get(tag), value));
       }
     }
@@ -799,9 +798,6 @@ public class DoFnOperator<InputT, OutputT> extends AbstractStreamOperator<Window
      */
     void flushBuffer() {
       for (KV<Integer, WindowedValue<?>> taggedElem : bufferState.read()) {
-        System.out.println(System.currentTimeMillis() + "\t" +
-                this + "\tflushBufferedData: " + taggedElem);
-
         emit(idsToTags.get(taggedElem.getKey()), (WindowedValue) taggedElem.getValue());
       }
       bufferState.clear();

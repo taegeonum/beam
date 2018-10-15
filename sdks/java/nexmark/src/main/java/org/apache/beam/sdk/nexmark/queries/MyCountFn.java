@@ -35,7 +35,7 @@ public final class MyCountFn<T> extends Combine.CombineFn<T, long[], Long> {
   }
    @Override
   public long[] addInput(long[] accumulator, T input) {
-     System.out.println("### Add input: " + input);
+     System.out.println("### " + System.currentTimeMillis() + " Add input: " + input);
      accumulator[0] += 1;
     return accumulator;
   }

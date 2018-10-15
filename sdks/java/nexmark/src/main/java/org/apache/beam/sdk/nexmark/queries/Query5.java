@@ -82,7 +82,7 @@ public class Query5 extends NexmarkQuery {
                 new DoFn<KV<Long, Long>, KV<List<Long>, Long>>() {
                   @ProcessElement
                   public void processElement(ProcessContext c) {
-                      System.out.println("ToSingleton: " + c.element().getKey()
+                      System.out.println(System.currentTimeMillis() + "\tToSingleton: " + c.element().getKey()
                               + ": " + c.element().getValue());
                     c.output(
                         KV.of(

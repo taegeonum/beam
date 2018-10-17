@@ -194,7 +194,7 @@ public class Query5Fix extends NexmarkQuery {
           PutRecordsRequest putRecordsRequest  = new PutRecordsRequest();
           putRecordsRequest.setStreamName(STREAMNAME);
           List<PutRecordsRequestEntry> putRecordsRequestEntryList  = new ArrayList<>();
-          for (int i = 0; i < 100; i++) {
+          for (int i = 0; i < 5; i++) {
               PutRecordsRequestEntry putRecordsRequestEntry  = new PutRecordsRequestEntry();
               putRecordsRequestEntry.setData(ByteBuffer.wrap(String.valueOf(i).getBytes()));
               putRecordsRequestEntry.setPartitionKey(String.format("partitionKey-%d", i));

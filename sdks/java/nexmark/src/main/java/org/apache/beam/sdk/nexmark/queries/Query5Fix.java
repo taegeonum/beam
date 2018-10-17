@@ -45,6 +45,7 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Query 5, 'Hot Items'. Which auctions have seen the most bids in the last hour (updated every
@@ -170,20 +171,25 @@ public class Query5Fix extends NexmarkQuery {
       // connection setup
       // 1) send to serverless
       // 2) receive from serverless
-      private final AmazonKinesisClientBuilder clientBuilder;
-      private final AmazonKinesis kinesisClient;
+      private transient AmazonKinesisClientBuilder clientBuilder;
+      private transient AmazonKinesis kinesisClient;
+
+      private transient boolean started = false;
 
       private static final String STREAMNAME = "nemo";
 
       public ToServerless() {
-          this.clientBuilder = AmazonKinesisClientBuilder.standard();
-          clientBuilder.setRegion("ap-northeast-1");
-          this.kinesisClient = clientBuilder.build();
 
       }
 
       @ProcessElement
       public void processElement(final ProcessContext c) {
+          if (!started) {
+              started = true;
+              this.clientBuilder = AmazonKinesisClientBuilder.standard();
+              clientBuilder.setRegion("ap-northeast-1");
+              this.kinesisClient = clientBuilder.build();
+          }
 
           PutRecordsRequest putRecordsRequest  = new PutRecordsRequest();
           putRecordsRequest.setStreamName(STREAMNAME);

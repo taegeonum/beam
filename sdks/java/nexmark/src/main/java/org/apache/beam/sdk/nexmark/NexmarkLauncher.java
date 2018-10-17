@@ -55,31 +55,7 @@ import org.apache.beam.sdk.nexmark.model.Bid;
 import org.apache.beam.sdk.nexmark.model.Event;
 import org.apache.beam.sdk.nexmark.model.KnownSize;
 import org.apache.beam.sdk.nexmark.model.Person;
-import org.apache.beam.sdk.nexmark.queries.NexmarkQuery;
-import org.apache.beam.sdk.nexmark.queries.NexmarkQueryModel;
-import org.apache.beam.sdk.nexmark.queries.Query0;
-import org.apache.beam.sdk.nexmark.queries.Query0Model;
-import org.apache.beam.sdk.nexmark.queries.Query1;
-import org.apache.beam.sdk.nexmark.queries.Query10;
-import org.apache.beam.sdk.nexmark.queries.Query11;
-import org.apache.beam.sdk.nexmark.queries.Query12;
-import org.apache.beam.sdk.nexmark.queries.Query1Model;
-import org.apache.beam.sdk.nexmark.queries.Query2;
-import org.apache.beam.sdk.nexmark.queries.Query2Model;
-import org.apache.beam.sdk.nexmark.queries.Query3;
-import org.apache.beam.sdk.nexmark.queries.Query3Model;
-import org.apache.beam.sdk.nexmark.queries.Query4;
-import org.apache.beam.sdk.nexmark.queries.Query4Model;
-import org.apache.beam.sdk.nexmark.queries.Query5;
-import org.apache.beam.sdk.nexmark.queries.Query5Model;
-import org.apache.beam.sdk.nexmark.queries.Query6;
-import org.apache.beam.sdk.nexmark.queries.Query6Model;
-import org.apache.beam.sdk.nexmark.queries.Query7;
-import org.apache.beam.sdk.nexmark.queries.Query7Model;
-import org.apache.beam.sdk.nexmark.queries.Query8;
-import org.apache.beam.sdk.nexmark.queries.Query8Model;
-import org.apache.beam.sdk.nexmark.queries.Query9;
-import org.apache.beam.sdk.nexmark.queries.Query9Model;
+import org.apache.beam.sdk.nexmark.queries.*;
 import org.apache.beam.sdk.nexmark.queries.sql.NexmarkSqlQuery;
 import org.apache.beam.sdk.nexmark.queries.sql.SqlQuery0;
 import org.apache.beam.sdk.nexmark.queries.sql.SqlQuery1;
@@ -1330,7 +1306,8 @@ public class NexmarkLauncher<OptionT extends NexmarkOptions> {
         new Query9Model(configuration),
         null,
         null,
-        null);
+        null,
+        new Query5Model(configuration));
   }
 
   private List<NexmarkQuery> createQueries() {
@@ -1363,7 +1340,9 @@ public class NexmarkLauncher<OptionT extends NexmarkOptions> {
         new Query9(configuration),
         new Query10(configuration),
         new Query11(configuration),
-        new Query12(configuration));
+        new Query12(configuration),
+        new Query5Fix(configuration));
+
   }
 
   private static class PubsubMessageEventDoFn extends DoFn<PubsubMessage, Event> {

@@ -22,6 +22,9 @@ import com.amazonaws.services.kinesis.AmazonKinesisClientBuilder;
 import com.amazonaws.services.kinesis.model.PutRecordsRequest;
 import com.amazonaws.services.kinesis.model.PutRecordsRequestEntry;
 import com.amazonaws.services.kinesis.model.PutRecordsResult;
+import org.apache.beam.sdk.coders.Coder;
+import org.apache.beam.sdk.coders.CoderException;
+import org.apache.beam.sdk.coders.CustomCoder;
 import org.apache.beam.sdk.nexmark.NexmarkConfiguration;
 import org.apache.beam.sdk.nexmark.NexmarkUtils;
 import org.apache.beam.sdk.nexmark.model.Event;
@@ -35,6 +38,9 @@ import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.TimestampedValue;
 import org.joda.time.Duration;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,8 +83,41 @@ public class Query5Fix extends NexmarkQuery {
         .apply(new MyPerElement<>())
         .apply(
                 name + ".ToServerless",
-                ParDo.of(new ToServerless()));
+                ParDo.of(new ToServerless()))
+            .setCoder(makeCastingCoder(elements.getCoder()));
   }
+
+
+    /** Return a coder for {@code KnownSize} that are known to be exactly of type {@code T}. */
+    private static <T extends KnownSize> Coder<KnownSize> makeCastingCoder(Coder<T> trueCoder) {
+        return new CastingCoder<>(trueCoder);
+    }
+
+
+    /**
+     * A coder for instances of {@code T} cast up to {@link KnownSize}.
+     *
+     * @param <T> True type of object.
+     */
+    private static class CastingCoder<T extends KnownSize> extends CustomCoder<KnownSize> {
+        private final Coder<T> trueCoder;
+
+        public CastingCoder(Coder<T> trueCoder) {
+            this.trueCoder = trueCoder;
+        }
+
+        @Override
+        public void encode(KnownSize value, OutputStream outStream) throws CoderException, IOException {
+            @SuppressWarnings("unchecked")
+            T typedValue = (T) value;
+            trueCoder.encode(typedValue, outStream);
+        }
+
+        @Override
+        public KnownSize decode(InputStream inStream) throws CoderException, IOException {
+            return trueCoder.decode(inStream);
+        }
+    }
 
   @Override
   protected PCollection<KnownSize> applyPrim(PCollection<Event> events) {

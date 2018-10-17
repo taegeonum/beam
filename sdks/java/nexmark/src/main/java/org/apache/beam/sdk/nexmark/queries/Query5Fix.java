@@ -25,6 +25,7 @@ import com.amazonaws.services.kinesis.model.PutRecordsResult;
 import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.coders.CoderException;
 import org.apache.beam.sdk.coders.CustomCoder;
+import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.nexmark.NexmarkConfiguration;
 import org.apache.beam.sdk.nexmark.NexmarkUtils;
 import org.apache.beam.sdk.nexmark.model.Event;
@@ -84,7 +85,7 @@ public class Query5Fix extends NexmarkQuery {
         .apply(
                 name + ".ToServerless",
                 ParDo.of(new ToServerless()))
-            .setCoder(makeCastingCoder(elements.getCoder()));
+            .setCoder(makeCastingCoder((Coder) StringUtf8Coder.of()));
   }
 
 

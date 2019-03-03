@@ -450,11 +450,19 @@ public class NexmarkUtils {
               long prevWindowTime = System.currentTimeMillis();
               long totalLatency = 0;
               int numEvents = 0;
+
               final Counter discardedCounterMetric = Metrics.counter(name, "discarded");
+              boolean firstEvent = true;
+              long adjustTime;
 
               @ProcessElement
               public void processElement(ProcessContext c) {
-                final long currTime = System.currentTimeMillis();
+                if (firstEvent) {
+                  adjustTime = System.currentTimeMillis() - BASE_TIME;
+                  firstEvent = false;
+                }
+
+                final long currTime = System.currentTimeMillis() - adjustTime;
                 totalLatency += (currTime - c.timestamp().getMillis());
                 numEvents += 1;
 

@@ -458,7 +458,7 @@ public class NexmarkUtils {
               @ProcessElement
               public void processElement(ProcessContext c) {
                 if (firstEvent) {
-                  adjustTime = System.currentTimeMillis() - BASE_TIME;
+                  adjustTime = System.currentTimeMillis() - c.timestamp().getMillis();
                   firstEvent = false;
                 }
 

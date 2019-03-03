@@ -462,8 +462,9 @@ public class NexmarkUtils {
                   firstEvent = false;
                 }
 
-                final long currTime = System.currentTimeMillis() - adjustTime;
-                totalLatency += (currTime - c.timestamp().getMillis());
+                final long currTime = System.currentTimeMillis();
+                final long adjCurrTime = currTime - adjustTime;
+                totalLatency += (adjCurrTime - c.timestamp().getMillis());
                 numEvents += 1;
 
                 if (currTime - prevWindowTime > windowSize) {

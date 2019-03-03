@@ -1087,13 +1087,16 @@ public class NexmarkLauncher<OptionT extends NexmarkOptions> {
   private void sink(PCollection<TimestampedValue<KnownSize>> results, long now) {
     if (configuration.sinkType == NexmarkUtils.SinkType.COUNT_ONLY) {
       // Avoid the cost of formatting the results.
+      LOG.info("Nexmark sink .DevNull");
       results.apply(queryName + ".DevNull", NexmarkUtils.devNull(queryName));
       return;
     }
 
+    LOG.info("Nexmark sink .Format");
     PCollection<String> formattedResults =
         results.apply(queryName + ".Format", NexmarkUtils.format(queryName));
     if (options.getLogResults()) {
+      LOG.info("Nexmark sink .Results.Log");
       formattedResults =
           formattedResults.apply(
               queryName + ".Results.Log", NexmarkUtils.log(queryName + ".Results"));
@@ -1102,6 +1105,7 @@ public class NexmarkLauncher<OptionT extends NexmarkOptions> {
     switch (configuration.sinkType) {
       case DEVNULL:
         // Discard all results
+        LOG.info("Nexmark sink .DevNull");
         formattedResults.apply(queryName + ".DevNull", NexmarkUtils.devNull(queryName));
         break;
       case PUBSUB:

@@ -443,9 +443,9 @@ public class NexmarkUtils {
 
 
   /** Return a transform to count and discard each element. */
-  public static <T> ParDo.SingleOutput<T, Void> devNull(final String name) {
+  public static <T> ParDo.SingleOutput<T, String> devStr(final String name) {
     return ParDo.of(
-            new DoFn<T, Void>() {
+            new DoFn<T, String>() {
               final long windowSize = 2000;
               long prevWindowTime = System.currentTimeMillis();
               long totalLatency = 0;
@@ -468,17 +468,33 @@ public class NexmarkUtils {
                 numEvents += 1;
 
                 if (currTime - prevWindowTime > windowSize) {
-                  LOG.info("Avg Latency (in {} window): {} (# events: {})",
+                  final String s = String.format("Avg Latency (in {} window): {} (# events: {})",
                           (currTime - prevWindowTime),
                           (totalLatency / numEvents), numEvents);
 
                   totalLatency = 0;
                   numEvents = 0;
                   prevWindowTime = currTime;
+
+                  c.output(s);
                 }
 
                 discardedCounterMetric.inc();
               }
+            });
+  }
+
+
+  /** Return a transform to count and discard each element. */
+  public static ParDo.SingleOutput<String, Void> devNull(final String name) {
+    return ParDo.of(
+            new DoFn<String, Void>() {
+
+              @ProcessElement
+              public void processElement(ProcessContext c) {
+                LOG.info(c.element());
+              }
+
             });
   }
 

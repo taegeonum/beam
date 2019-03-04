@@ -468,7 +468,7 @@ public class NexmarkUtils {
                 numEvents += 1;
 
                 if (currTime - prevWindowTime > windowSize) {
-                  final String s = String.format("Avg Latency (in {} window): {} (# events: {})",
+                  final String s = String.format("Avg Latency (in %d window): %d (# events: %d)",
                           (currTime - prevWindowTime),
                           (totalLatency / numEvents), numEvents);
 

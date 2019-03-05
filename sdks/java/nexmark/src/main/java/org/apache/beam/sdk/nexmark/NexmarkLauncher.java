@@ -1088,8 +1088,7 @@ public class NexmarkLauncher<OptionT extends NexmarkOptions> {
     if (configuration.sinkType == NexmarkUtils.SinkType.COUNT_ONLY) {
       // Avoid the cost of formatting the results.
       LOG.info("Nexmark sink .DevNull");
-      results.apply(queryName + ".Str", NexmarkUtils.devStr(queryName))
-              .apply(queryName + ".DevNull", NexmarkUtils.devNull(queryName));
+      results.apply(queryName + ".DevNull", NexmarkUtils.devNull(queryName));
       return;
     }
 
@@ -1107,8 +1106,7 @@ public class NexmarkLauncher<OptionT extends NexmarkOptions> {
       case DEVNULL:
         // Discard all results
         LOG.info("Nexmark sink .DevNull");
-         formattedResults.apply(queryName + ".Str", NexmarkUtils.devStr(queryName))
-              .apply(queryName + ".DevNull", NexmarkUtils.devNull(queryName));
+        formattedResults.apply(queryName + ".DevNull", NexmarkUtils.devNull(queryName));
         break;
       case PUBSUB:
         sinkResultsToPubsub(formattedResults, now);

@@ -446,37 +446,10 @@ public class NexmarkUtils {
   public static <T> ParDo.SingleOutput<T, Void> devNull(final String name) {
     return ParDo.of(
             new DoFn<T, Void>() {
-              final long windowSize = 2000;
-              long prevWindowTime = System.currentTimeMillis();
-              long totalLatency = 0;
-              int numEvents = 0;
-
               final Counter discardedCounterMetric = Metrics.counter(name, "discarded");
-              boolean firstEvent = true;
-              long adjustTime;
 
               @ProcessElement
               public void processElement(ProcessContext c) {
-                if (firstEvent) {
-                  adjustTime = System.currentTimeMillis() - c.timestamp().getMillis();
-                  firstEvent = false;
-                }
-
-                final long currTime = System.currentTimeMillis();
-                final long adjCurrTime = currTime - adjustTime;
-                totalLatency += (adjCurrTime - c.timestamp().getMillis());
-                numEvents += 1;
-
-                if (currTime - prevWindowTime > windowSize) {
-                  LOG.info("Avg Latency (in {} window): {} (# events: {})",
-                          (currTime - prevWindowTime),
-                          (totalLatency / numEvents), numEvents);
-
-                  totalLatency = 0;
-                  numEvents = 0;
-                  prevWindowTime = currTime;
-                }
-
                 discardedCounterMetric.inc();
               }
             });

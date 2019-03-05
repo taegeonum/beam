@@ -479,6 +479,7 @@ public class NexmarkUtils {
           @ProcessElement
           public void processElement(ProcessContext c) {
             recordCounterMetric.inc();
+            c.output(c.element().toString());
           }
         });
   }
@@ -490,7 +491,6 @@ public class NexmarkUtils {
 
           @ProcessElement
           public void processElement(ProcessContext c) {
-
             if (random.nextDouble() <= samplingRate) {
               c.output(c.element());
             }

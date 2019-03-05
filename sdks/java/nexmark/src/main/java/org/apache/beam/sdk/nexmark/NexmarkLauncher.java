@@ -1094,7 +1094,12 @@ public class NexmarkLauncher<OptionT extends NexmarkOptions> {
 
     LOG.info("Nexmark sink .Format");
     PCollection<String> formattedResults =
-        results.apply(queryName + ".Format", NexmarkUtils.format(queryName));
+        results.apply(queryName + ".Format", NexmarkUtils.format(queryName))
+                .apply(queryName + ".Sampling",
+                        NexmarkUtils.sampling(queryName, options.getSamplingRate()));
+
+    LOG.info("Sampling rate: {}", options.getSamplingRate());
+
     if (options.getLogResults()) {
       LOG.info("Nexmark sink .Results.Log");
       formattedResults =

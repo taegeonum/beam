@@ -308,7 +308,12 @@ public interface NexmarkOptions
   @Nullable
   Long getCpuDelayMs();
 
+
   void setCpuDelayMs(Long cpuDelayMs);
+
+  @Nullable
+  Double getSamplingRate();
+  void setSamplingRate(Double samplingRate);
 
   @Description(
       "Extra data, in bytes, to save to persistent state for each event. "

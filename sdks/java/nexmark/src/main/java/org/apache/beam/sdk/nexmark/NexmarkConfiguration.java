@@ -144,6 +144,9 @@ public class NexmarkConfiguration implements Serializable {
    */
   @JsonProperty public long cpuDelayMs = 0;
 
+  // Sampling rate of result of a query
+  @JsonProperty public double samplingRate = 1.0;
+
   /**
    * Extra data, in bytes, to save to persistent state for each event. This will force i/o all the
    * way to durable storage to simulate an I/O-bound computation.
@@ -272,6 +275,9 @@ public class NexmarkConfiguration implements Serializable {
     if (options.getCpuDelayMs() != null) {
       cpuDelayMs = options.getCpuDelayMs();
     }
+    if (options.getSamplingRate() != null) {
+      samplingRate = options.getSamplingRate();
+    }
     if (options.getDiskBusyBytes() != null) {
       diskBusyBytes = options.getDiskBusyBytes();
     }
@@ -335,6 +341,7 @@ public class NexmarkConfiguration implements Serializable {
     result.numActivePeople = numActivePeople;
     result.coderStrategy = coderStrategy;
     result.cpuDelayMs = cpuDelayMs;
+    result.samplingRate = samplingRate;
     result.diskBusyBytes = diskBusyBytes;
     result.auctionSkip = auctionSkip;
     result.fanout = fanout;
@@ -439,6 +446,9 @@ public class NexmarkConfiguration implements Serializable {
     if (cpuDelayMs != DEFAULT.cpuDelayMs) {
       sb.append(String.format("; cpuSlowdownMs:%d", cpuDelayMs));
     }
+    if (samplingRate != DEFAULT.samplingRate) {
+      sb.append(String.format("; samplingRate:%d", samplingRate));
+    }
     if (diskBusyBytes != DEFAULT.diskBusyBytes) {
       sb.append(String.format("; diskBuysBytes:%d", diskBusyBytes));
     }
@@ -521,6 +531,7 @@ public class NexmarkConfiguration implements Serializable {
         numActivePeople,
         coderStrategy,
         cpuDelayMs,
+        samplingRate,
         diskBusyBytes,
         auctionSkip,
         fanout,
@@ -563,6 +574,9 @@ public class NexmarkConfiguration implements Serializable {
       return false;
     }
     if (cpuDelayMs != other.cpuDelayMs) {
+      return false;
+    }
+    if (samplingRate != other.samplingRate) {
       return false;
     }
     if (diskBusyBytes != other.diskBusyBytes) {

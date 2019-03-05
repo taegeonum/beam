@@ -25,6 +25,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
+import java.util.Random;
+
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.coders.AvroCoder;
 import org.apache.beam.sdk.coders.ByteArrayCoder;
@@ -477,7 +479,21 @@ public class NexmarkUtils {
           @ProcessElement
           public void processElement(ProcessContext c) {
             recordCounterMetric.inc();
-            c.output(c.element().toString());
+          }
+        });
+  }
+
+  public static <T> ParDo.SingleOutput<T, T> sampling(final String name, final double samplingRate) {
+     return ParDo.of(
+        new DoFn<T, T>() {
+           final Random random = new Random();
+
+          @ProcessElement
+          public void processElement(ProcessContext c) {
+
+            if (random.nextDouble() <= samplingRate) {
+              c.output(c.element());
+            }
           }
         });
   }

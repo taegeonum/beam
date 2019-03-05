@@ -447,7 +447,7 @@ public class NexmarkConfiguration implements Serializable {
       sb.append(String.format("; cpuSlowdownMs:%d", cpuDelayMs));
     }
     if (samplingRate != DEFAULT.samplingRate) {
-      sb.append(String.format("; samplingRate:%d", samplingRate));
+      sb.append(String.format("; samplingRate:%f", samplingRate));
     }
     if (diskBusyBytes != DEFAULT.diskBusyBytes) {
       sb.append(String.format("; diskBuysBytes:%d", diskBusyBytes));

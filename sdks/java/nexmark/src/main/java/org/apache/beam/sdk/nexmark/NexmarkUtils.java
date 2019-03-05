@@ -462,8 +462,6 @@ public class NexmarkUtils {
                   firstEvent = false;
                 }
 
-                System.out.println("adjustTime: " + adjustTime);
-
                 final long currTime = System.currentTimeMillis();
                 final long adjCurrTime = currTime - adjustTime;
                 totalLatency += (adjCurrTime - c.timestamp().getMillis());

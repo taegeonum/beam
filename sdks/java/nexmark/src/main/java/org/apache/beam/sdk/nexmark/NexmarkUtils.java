@@ -445,14 +445,15 @@ public class NexmarkUtils {
 
 
   /** Return a transform to count and discard each element. */
-  public static <T> ParDo.SingleOutput<T, Void> devNull(final String name) {
+  public static <T> ParDo.SingleOutput<T, T> devNull(final String name) {
     return ParDo.of(
-            new DoFn<T, Void>() {
+            new DoFn<T, T>() {
               final Counter discardedCounterMetric = Metrics.counter(name, "discarded");
 
               @ProcessElement
               public void processElement(ProcessContext c) {
                 discardedCounterMetric.inc();
+                c.output(c.element());
               }
             });
   }

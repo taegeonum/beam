@@ -379,6 +379,7 @@ public class NexmarkUtils {
 
   /** Return a generator config to match the given {@code options}. */
   private static GeneratorConfig standardGeneratorConfig(NexmarkConfiguration configuration) {
+    LOG.info("BASE TIME!!: {}", BASE_TIME);
     return new GeneratorConfig(
         configuration,
         configuration.useWallclockEventTime ? System.currentTimeMillis() : BASE_TIME,

@@ -312,6 +312,10 @@ public interface NexmarkOptions
   void setCpuDelayMs(Long cpuDelayMs);
 
   @Nullable
+  Integer getSplitNum();
+  void setSplitNum(Integer splitNum);
+
+  @Nullable
   Double getSamplingRate();
   void setSamplingRate(Double samplingRate);
 

@@ -147,6 +147,8 @@ public class NexmarkConfiguration implements Serializable {
   // Sampling rate of result of a query
   @JsonProperty public double samplingRate = 1.0;
 
+  @JsonProperty public int splitNum = 1;
+
   /**
    * Extra data, in bytes, to save to persistent state for each event. This will force i/o all the
    * way to durable storage to simulate an I/O-bound computation.
@@ -278,6 +280,9 @@ public class NexmarkConfiguration implements Serializable {
     if (options.getSamplingRate() != null) {
       samplingRate = options.getSamplingRate();
     }
+    if (options.getSplitNum() != null) {
+      splitNum = options.getSplitNum();
+    }
     if (options.getDiskBusyBytes() != null) {
       diskBusyBytes = options.getDiskBusyBytes();
     }
@@ -342,6 +347,7 @@ public class NexmarkConfiguration implements Serializable {
     result.coderStrategy = coderStrategy;
     result.cpuDelayMs = cpuDelayMs;
     result.samplingRate = samplingRate;
+    result.splitNum = splitNum;
     result.diskBusyBytes = diskBusyBytes;
     result.auctionSkip = auctionSkip;
     result.fanout = fanout;
@@ -449,6 +455,9 @@ public class NexmarkConfiguration implements Serializable {
     if (samplingRate != DEFAULT.samplingRate) {
       sb.append(String.format("; samplingRate:%f", samplingRate));
     }
+    if (splitNum != DEFAULT.splitNum) {
+      sb.append(String.format("; splitNum:%d", splitNum));
+    }
     if (diskBusyBytes != DEFAULT.diskBusyBytes) {
       sb.append(String.format("; diskBuysBytes:%d", diskBusyBytes));
     }
@@ -532,6 +541,7 @@ public class NexmarkConfiguration implements Serializable {
         coderStrategy,
         cpuDelayMs,
         samplingRate,
+        splitNum,
         diskBusyBytes,
         auctionSkip,
         fanout,
@@ -577,6 +587,9 @@ public class NexmarkConfiguration implements Serializable {
       return false;
     }
     if (samplingRate != other.samplingRate) {
+      return false;
+    }
+    if (splitNum != other.splitNum) {
       return false;
     }
     if (diskBusyBytes != other.diskBusyBytes) {

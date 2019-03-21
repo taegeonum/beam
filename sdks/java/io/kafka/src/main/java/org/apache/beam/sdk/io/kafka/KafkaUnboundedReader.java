@@ -184,7 +184,7 @@ class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V>> {
      *  - (c) curBatch is an iterator of iterators. we interleave the records from each.
      *        curBatch.next() might return an empty iterator.
      */
-    LOG.info("advance");
+    System.out.println("advance");
     while (true) {
       if (curBatch.hasNext()) {
         PartitionState<K, V> pState = curBatch.next();

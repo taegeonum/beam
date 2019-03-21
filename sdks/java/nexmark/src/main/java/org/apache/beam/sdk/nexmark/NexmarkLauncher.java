@@ -820,6 +820,7 @@ public class NexmarkLauncher<OptionT extends NexmarkOptions> {
                 .collect(Collectors.toList()))
                 */
             .withKeyDeserializer(LongDeserializer.class)
+                /*
             .withValueDeserializer(EventDeserializer.class)
                 .withTimestampPolicyFactory(new TimestampPolicyFactory<Long, Event>() {
                   @Override
@@ -827,7 +828,8 @@ public class NexmarkLauncher<OptionT extends NexmarkOptions> {
                     return new KafkaTimestampPolicy();
                   }
                 })
-                //.withCreateTime(Duration.standardSeconds(5))
+                */
+                .withCreateTime(Duration.standardSeconds(5))
             .withStartReadTime(now);
             //.withMaxNumRecords(
             //    options.getNumEvents() != null ? options.getNumEvents() : Long.MAX_VALUE);

@@ -820,8 +820,8 @@ public class NexmarkLauncher<OptionT extends NexmarkOptions> {
                 .collect(Collectors.toList()))
                 */
             .withKeyDeserializer(LongDeserializer.class)
-                /*
             .withValueDeserializer(EventDeserializer.class)
+                /*
                 .withTimestampPolicyFactory(new TimestampPolicyFactory<Long, Event>() {
                   @Override
                   public TimestampPolicy<Long, Event> createTimestampPolicy(TopicPartition tp, Optional<Instant> previousWatermark) {

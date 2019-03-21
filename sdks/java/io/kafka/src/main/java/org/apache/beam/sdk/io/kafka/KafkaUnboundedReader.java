@@ -184,7 +184,6 @@ class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V>> {
      *  - (c) curBatch is an iterator of iterators. we interleave the records from each.
      *        curBatch.next() might return an empty iterator.
      */
-    System.out.println("advance");
     while (true) {
       if (curBatch.hasNext()) {
         PartitionState<K, V> pState = curBatch.next();
@@ -262,15 +261,12 @@ class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V>> {
     if (source.getSpec().getWatermarkFn() != null) {
       // Support old API which requires a KafkaRecord to invoke watermarkFn.
       //LOG.info("{}: getWatermark() : no records have been read yet.", name);
-      LOG.info("geWatermarkFn: {}", source.getSpec().getWatermarkFn().getClass().getName());
       if (curRecord == null) {
         LOG.debug("{}: getWatermark() : no records have been read yet.", name);
         return initialWatermark;
       }
       return source.getSpec().getWatermarkFn().apply(curRecord);
     }
-
-    LOG.info("Get watermark!!!");
 
     // Return minimum watermark among partitions.
     return partitionStates

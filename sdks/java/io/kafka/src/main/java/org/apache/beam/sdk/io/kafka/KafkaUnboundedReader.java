@@ -128,6 +128,7 @@ class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V>> {
       } catch (Exception e) {
         throw new IOException(e);
       }
+      LOG.info("Hello ^^^^^");
       LOG.info(
           "{}: reading from {} starting at offset {}",
           name,

@@ -260,7 +260,7 @@ class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V>> {
 
     if (source.getSpec().getWatermarkFn() != null) {
       // Support old API which requires a KafkaRecord to invoke watermarkFn.
-      LOG.info("{}: getWatermark() : no records have been read yet.", name);
+      //LOG.info("{}: getWatermark() : no records have been read yet.", name);
       if (curRecord == null) {
         LOG.debug("{}: getWatermark() : no records have been read yet.", name);
         return initialWatermark;
@@ -509,7 +509,7 @@ class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V>> {
     }
 
     Instant updateAndGetWatermark() {
-      LOG.info("TimetampPolicy: {}, Last watermark {}:", timestampPolicy, lastWatermark);
+      //LOG.info("TimetampPolicy: {}, Last watermark {}:", timestampPolicy, lastWatermark);
       lastWatermark = timestampPolicy.getWatermark(mkTimestampPolicyContext());
       return lastWatermark;
     }

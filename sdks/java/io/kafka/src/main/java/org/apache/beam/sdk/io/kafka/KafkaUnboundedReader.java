@@ -508,6 +508,7 @@ class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V>> {
     }
 
     Instant updateAndGetWatermark() {
+      LOG.info("TimetampPolicy: {}, Last watermark {}:", timestampPolicy, lastWatermark);
       lastWatermark = timestampPolicy.getWatermark(mkTimestampPolicyContext());
       return lastWatermark;
     }

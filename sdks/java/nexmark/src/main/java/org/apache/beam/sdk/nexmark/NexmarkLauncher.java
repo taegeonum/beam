@@ -815,10 +815,12 @@ public class NexmarkLauncher<OptionT extends NexmarkOptions> {
         KafkaIO.<Long, Event>read()
             .withBootstrapServers(options.getBootstrapServers())
             .withTopic(options.getKafkaTopic())
+                /*
                 .withTopicPartitions(
-                        IntStream.range(0, options.getPartition())
+                        IntStream.range(0, options.getNumEventGenerators())
                 .mapToObj(index -> new TopicPartition(options.getKafkaTopic(), index))
                 .collect(Collectors.toList()))
+                */
             .withKeyDeserializer(LongDeserializer.class)
             .withValueDeserializer(EventDeserializer.class)
                 .withCreateTime(Duration.standardSeconds(5))

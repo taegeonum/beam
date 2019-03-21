@@ -805,9 +805,9 @@ public class NexmarkLauncher<OptionT extends NexmarkOptions> {
             .withTopic(options.getKafkaTopic())
             .withKeyDeserializer(LongDeserializer.class)
             .withValueDeserializer(ByteArrayDeserializer.class)
-            .withStartReadTime(now)
-            .withMaxNumRecords(
-                options.getNumEvents() != null ? options.getNumEvents() : Long.MAX_VALUE);
+            .withStartReadTime(now);
+            //.withMaxNumRecords(
+            //    options.getNumEvents() != null ? options.getNumEvents() : Long.MAX_VALUE);
 
     return p.apply(queryName + ".ReadKafkaEvents", read.withoutMetadata())
         .apply(queryName + ".KafkaToEvents", ParDo.of(BYTEARRAY_TO_EVENT));

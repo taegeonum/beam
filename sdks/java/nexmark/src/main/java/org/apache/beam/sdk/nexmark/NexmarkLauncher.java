@@ -34,6 +34,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
@@ -73,6 +75,7 @@ import org.apache.beam.sdk.values.PCollectionTuple;
 import org.apache.beam.sdk.values.TimestampedValue;
 import org.apache.beam.sdk.values.TupleTag;
 import org.apache.beam.sdk.values.TupleTagList;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.LongDeserializer;
@@ -812,6 +815,10 @@ public class NexmarkLauncher<OptionT extends NexmarkOptions> {
         KafkaIO.<Long, Event>read()
             .withBootstrapServers(options.getBootstrapServers())
             .withTopic(options.getKafkaTopic())
+                .withTopicPartitions(
+                        IntStream.range(0, options.getPartition())
+                .mapToObj(index -> new TopicPartition(options.getKafkaTopic(), index))
+                .collect(Collectors.toList()))
             .withKeyDeserializer(LongDeserializer.class)
             .withValueDeserializer(EventDeserializer.class)
                 .withCreateTime(Duration.standardSeconds(5))

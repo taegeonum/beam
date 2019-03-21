@@ -439,6 +439,13 @@ public interface NexmarkOptions
 
   void setKafkaTopic(String value);
 
+  @Description("kafka partition")
+  @Nullable
+  @Default.Integer(1)
+  Integer getPartition();
+
+  void setPartition(Integer value);
+
   @Description("Base name of Kafka results topic in streaming mode.")
   @Nullable
   @Default.String("nexmark-results")

@@ -28,11 +28,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -45,6 +41,8 @@ import org.apache.beam.sdk.io.gcp.bigquery.BigQueryIO;
 import org.apache.beam.sdk.io.gcp.pubsub.PubsubIO;
 import org.apache.beam.sdk.io.gcp.pubsub.PubsubMessage;
 import org.apache.beam.sdk.io.kafka.KafkaIO;
+import org.apache.beam.sdk.io.kafka.TimestampPolicy;
+import org.apache.beam.sdk.io.kafka.TimestampPolicyFactory;
 import org.apache.beam.sdk.metrics.DistributionResult;
 import org.apache.beam.sdk.metrics.MetricNameFilter;
 import org.apache.beam.sdk.metrics.MetricQueryResults;
@@ -823,7 +821,13 @@ public class NexmarkLauncher<OptionT extends NexmarkOptions> {
                 */
             .withKeyDeserializer(LongDeserializer.class)
             .withValueDeserializer(EventDeserializer.class)
-                .withCreateTime(Duration.standardSeconds(5))
+                .withTimestampPolicyFactory(new TimestampPolicyFactory<Long, Event>() {
+                  @Override
+                  public TimestampPolicy<Long, Event> createTimestampPolicy(TopicPartition tp, Optional<Instant> previousWatermark) {
+                    return new KafkaTimestampPolicy();
+                  }
+                })
+                //.withCreateTime(Duration.standardSeconds(5))
             .withStartReadTime(now);
             //.withMaxNumRecords(
             //    options.getNumEvents() != null ? options.getNumEvents() : Long.MAX_VALUE);

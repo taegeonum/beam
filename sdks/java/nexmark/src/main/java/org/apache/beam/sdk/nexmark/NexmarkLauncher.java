@@ -821,7 +821,7 @@ public class NexmarkLauncher<OptionT extends NexmarkOptions> {
                 */
             .withKeyDeserializer(LongDeserializer.class)
             .withValueDeserializer(EventDeserializer.class)
-                //.withTimestampPolicyFactory(new KafkaTimestampPolicyFactory())
+                .withTimestampPolicyFactory(new KafkaTimestampPolicyFactory())
                 //.withCreateTime(Duration.standardSeconds(5))
             .withStartReadTime(now);
             //.withMaxNumRecords(

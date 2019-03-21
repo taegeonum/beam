@@ -9,20 +9,18 @@ import java.io.Serializable;
 
 public class KafkaTimestampPolicy extends TimestampPolicy implements Serializable {
 
-    private transient KafkaRecord prevRecord = null;
+    private long timestamp = -1;
 
     @Override
     public Instant getTimestampForRecord(PartitionContext ctx, KafkaRecord record) {
-        prevRecord = record;
+        if (record.getTimestamp() > timestamp) {
+            timestamp = record.getTimestamp();
+        }
         return new Instant(record.getTimestamp());
     }
 
     @Override
     public Instant getWatermark(PartitionContext ctx) {
-        if (prevRecord == null) {
-            return new Instant(-1);
-        } else {
-            return new Instant(prevRecord.getTimestamp());
-        }
+        return new Instant(timestamp);
     }
 }

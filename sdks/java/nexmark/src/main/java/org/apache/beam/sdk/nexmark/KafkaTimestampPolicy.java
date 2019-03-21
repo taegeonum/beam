@@ -15,10 +15,10 @@ public class KafkaTimestampPolicy extends TimestampPolicy implements Serializabl
 
     @Override
     public Instant getTimestampForRecord(PartitionContext ctx, KafkaRecord record) {
-        LOG.info("GetTimestamp: {}", this);
+        //LOG.info("GetTimestamp: {}", this);
 
         if (record.getTimestamp() > timestamp) {
-            LOG.info("Timestamp set: {}", record.getTimestamp());
+            //LOG.info("Timestamp set: {}", record.getTimestamp());
             timestamp = record.getTimestamp();
         }
         return new Instant(record.getTimestamp());
@@ -26,7 +26,7 @@ public class KafkaTimestampPolicy extends TimestampPolicy implements Serializabl
 
     @Override
     public Instant getWatermark(PartitionContext ctx) {
-        LOG.info("GetWatermark {}", this);
+        //LOG.info("GetWatermark {}", this);
         return new Instant(timestamp);
     }
 }

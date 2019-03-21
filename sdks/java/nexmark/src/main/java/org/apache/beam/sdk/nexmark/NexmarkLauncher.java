@@ -794,23 +794,33 @@ public class NexmarkLauncher<OptionT extends NexmarkOptions> {
         }
       };
 
+
+  static final DoFn<KV<Long, Event>, Event> KV_TO_EVENT =
+      new DoFn<KV<Long, Event>, Event>() {
+        @ProcessElement
+        public void processElement(ProcessContext c) throws IOException {
+          c.output(c.element().getValue());
+        }
+      };
+
   /** Return source of events from Kafka. */
   private PCollection<Event> sourceEventsFromKafka(Pipeline p, final Instant now) {
     checkArgument((options.getBootstrapServers() != null), "Missing --bootstrapServers");
     NexmarkUtils.console("Reading events from Kafka Topic %s", options.getKafkaTopic());
 
-    KafkaIO.Read<Long, byte[]> read =
-        KafkaIO.<Long, byte[]>read()
+    KafkaIO.Read<Long, Event> read =
+        KafkaIO.<Long, Event>read()
             .withBootstrapServers(options.getBootstrapServers())
             .withTopic(options.getKafkaTopic())
             .withKeyDeserializer(LongDeserializer.class)
-            .withValueDeserializer(ByteArrayDeserializer.class)
+            .withValueDeserializer(EventDeserializer.class)
             .withStartReadTime(now);
             //.withMaxNumRecords(
             //    options.getNumEvents() != null ? options.getNumEvents() : Long.MAX_VALUE);
 
     return p.apply(queryName + ".ReadKafkaEvents", read.withoutMetadata())
-        .apply(queryName + ".KafkaToEvents", ParDo.of(BYTEARRAY_TO_EVENT));
+            .apply(queryName + "kvToEvent", ParDo.of(KV_TO_EVENT));
+        //.apply(queryName + ".KafkaToEvents", ParDo.of(BYTEARRAY_TO_EVENT));
   }
 
   /** Return Avro source of events from {@code options.getInputFilePrefix}. */

@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 public class KafkaTimestampPolicy extends TimestampPolicy implements Serializable {
 
-    private KafkaRecord prevRecord = null;
+    private transient KafkaRecord prevRecord = null;
 
     @Override
     public Instant getTimestampForRecord(PartitionContext ctx, KafkaRecord record) {

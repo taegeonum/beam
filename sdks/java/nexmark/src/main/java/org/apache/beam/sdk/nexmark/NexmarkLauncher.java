@@ -814,6 +814,7 @@ public class NexmarkLauncher<OptionT extends NexmarkOptions> {
             .withTopic(options.getKafkaTopic())
             .withKeyDeserializer(LongDeserializer.class)
             .withValueDeserializer(EventDeserializer.class)
+                .withCreateTime(Duration.standardSeconds(5))
             .withStartReadTime(now);
             //.withMaxNumRecords(
             //    options.getNumEvents() != null ? options.getNumEvents() : Long.MAX_VALUE);

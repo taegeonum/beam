@@ -56,6 +56,8 @@ class KafkaUnboundedSource<K, V> extends UnboundedSource<KafkaRecord<K, V>, Kafk
 
     List<TopicPartition> partitions = new ArrayList<>(spec.getTopicPartitions());
 
+    LOG.info("Kafka desiredNumsplits: {}, # of partitions: {}, {}", desiredNumSplits, partitions.size(), partitions);
+
     // (a) fetch partitions for each topic
     // (b) sort by <topic, partition>
     // (c) round-robin assign the partitions to splits
@@ -69,6 +71,8 @@ class KafkaUnboundedSource<K, V> extends UnboundedSource<KafkaRecord<K, V>, Kafk
         }
       }
     }
+
+    LOG.info("After adding partitions: {}, {}", partitions.size(), partitions);
 
     partitions.sort(
         Comparator.comparing(TopicPartition::topic)

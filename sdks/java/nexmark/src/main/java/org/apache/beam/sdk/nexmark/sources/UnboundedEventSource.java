@@ -158,8 +158,8 @@ public class UnboundedEventSource extends UnboundedSource<Event, GeneratorCheckp
         if (next != null && next.wallclockTimestamp <= now) {
           // Time to use the held-back event.
           heldBackEvents.poll();
-          LOG.debug(
-              "replaying held-back event {}ms behind watermark", watermark - next.eventTimestamp);
+          /*LOG.debug(
+              "replaying held-back event {}ms behind watermark", watermark - next.eventTimestamp);*/
         } else if (generator.hasNext()) {
           next = generator.nextEvent();
           //LOG.info("Generator.nextEvent(): {}", next);
@@ -171,7 +171,7 @@ public class UnboundedEventSource extends UnboundedSource<Event, GeneratorCheckp
             //LOG.info("isRateLimited && config.geProbm... && config.getOccasional");
             long delayMs =
                 ThreadLocalRandom.current().nextLong(config.getOccasionalDelaySec() * 1000) + 1L;
-            LOG.debug("delaying event by {}ms", delayMs);
+            /*LOG.debug("delaying event by {}ms", delayMs);*/
             //LOG.info("Heldback add with delay {}", delayMs);
             heldBackEvents.add(next.withDelay(delayMs));
             continue;

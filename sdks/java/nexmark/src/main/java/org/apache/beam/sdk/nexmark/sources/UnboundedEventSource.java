@@ -235,6 +235,7 @@ public class UnboundedEventSource extends UnboundedSource<Event, GeneratorCheckp
               pendingEvent.getTimestamp().getMillis() - timestampAtLastReportedBacklogMs;
           timeDialation = (double) eventTimeProgressionMs / (double) wallclockProgressionMs;
         }
+        /*
         LOG.debug(
             "unbounded generator backlog now {}ms ({} bytes) at {}us interEventDelay "
                 + "with {} time dilation",
@@ -242,6 +243,7 @@ public class UnboundedEventSource extends UnboundedSource<Event, GeneratorCheckp
             backlogBytes,
             interEventDelayUs,
             timeDialation);
+            */
         lastReportedBacklogWallclock = now;
         if (pendingEvent != null) {
           timestampAtLastReportedBacklogMs = pendingEvent.getTimestamp().getMillis();

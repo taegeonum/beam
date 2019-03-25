@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * An {@link UnboundedSource} to read from Kafka, used by {@link Read} transform in KafkaIO. See
  * {@link KafkaIO} for user visible documentation and example usage.
  */
-class KafkaUnboundedSource<K, V> extends UnboundedSource<KafkaRecord<K, V>, KafkaCheckpointMark> {
+public class KafkaUnboundedSource<K, V> extends UnboundedSource<KafkaRecord<K, V>, KafkaCheckpointMark> {
 
   /**
    * The partitions are evenly distributed among the splits. The number of splits returned is {@code
@@ -83,9 +83,9 @@ class KafkaUnboundedSource<K, V> extends UnboundedSource<KafkaRecord<K, V>, Kafk
         partitions.size() > 0,
         "Could not find any partitions. Please check Kafka configuration and topic names");
 
-    //int numSplits = Math.min(desiredNumSplits, partitions.size());
+    int numSplits = Math.min(desiredNumSplits, partitions.size());
     // set split to the number of partitions!
-    int numSplits = partitions.size();
+    //int numSplits = partitions.size();
     List<List<TopicPartition>> assignments = new ArrayList<>(numSplits);
 
     for (int i = 0; i < numSplits; i++) {
@@ -161,8 +161,12 @@ class KafkaUnboundedSource<K, V> extends UnboundedSource<KafkaRecord<K, V>, Kafk
     this.id = id;
   }
 
-  Read<K, V> getSpec() {
+  public Read<K, V> getSpec() {
     return spec;
+  }
+
+  public List<TopicPartition> getTopicPartitions() {
+    return spec.getTopicPartitions();
   }
 
   int getId() {

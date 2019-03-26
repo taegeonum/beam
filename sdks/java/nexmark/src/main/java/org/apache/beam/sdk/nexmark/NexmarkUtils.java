@@ -550,7 +550,8 @@ public class NexmarkUtils {
         new DoFn<T, T>() {
           @ProcessElement
           public void processElement(ProcessContext c) {
-            long now = System.currentTimeMillis();
+            long now = System.nanoTime();
+            //long now = System.currentTimeMillis();
             long end = now + delayMs;
             while (now < end) {
               // Find plaintext which hashes to HASH in lowest MASK bits.
@@ -563,7 +564,8 @@ public class NexmarkUtils {
                 }
                 p++;
               }
-              now = System.currentTimeMillis();
+              //now = System.currentTimeMillis();
+              now = System.nanoTime();
             }
             c.output(c.element());
           }

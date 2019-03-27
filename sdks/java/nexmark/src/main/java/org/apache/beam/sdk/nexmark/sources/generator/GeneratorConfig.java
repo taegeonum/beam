@@ -98,8 +98,8 @@ public class GeneratorConfig implements Serializable {
     this.interEventDelayUs =
         configuration.rateShape.interEventDelayUs(
             configuration.firstEventRate, configuration.nextEventRate,
-            configuration.rateUnit, configuration.numEventGenerators);
-    this.stepLengthSec = configuration.rateShape.stepLengthSec(configuration.ratePeriodSec);
+            configuration.rateUnit, configuration.numEventGenerators, configuration.burstyStep);
+    this.stepLengthSec = configuration.rateShape.stepLengthSec(configuration.ratePeriodSec, configuration.burstyStep);
     this.baseTime = baseTime;
     this.firstEventId = firstEventId;
     if (maxEventsOrZero == 0) {

@@ -319,6 +319,10 @@ public interface NexmarkOptions
   Double getSamplingRate();
   void setSamplingRate(Double samplingRate);
 
+  @Nullable
+  Integer getBurstyStep();
+  void setBurstyStep(Integer burstyStep);
+
   @Description(
       "Extra data, in bytes, to save to persistent state for each event. "
           + "This will force I/O all the way to durable storage to simulate an "

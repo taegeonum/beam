@@ -557,7 +557,7 @@ public class NexmarkUtils {
               // Find plaintext which hashes to HASH in lowest MASK bits.
               // Values chosen to roughly take 1ms on typical workstation.
               long p = INIT_PLAINTEXT;
-              while (true) {
+              while (System.nanoTime() < end) {
                 long t = Hashing.murmur3_128().hashLong(p).asLong();
                 if ((t & MASK) == (HASH & MASK)) {
                   break;

@@ -278,7 +278,7 @@ public class NexmarkUtils {
             interEventDelayUs[i] = normalDelayUs;
           }
 
-          interEventDelayUs[burstyN - 1] = burstyDelayUS;
+          interEventDelayUs[(burstyN)/2] = burstyDelayUS;
 
           LOG.info("Normal delay: {}, Bursty delay: {}", normalDelayUs, burstyDelayUS);
           return interEventDelayUs;

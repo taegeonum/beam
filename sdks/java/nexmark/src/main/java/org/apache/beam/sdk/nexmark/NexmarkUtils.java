@@ -303,7 +303,7 @@ public class NexmarkUtils {
             }
           }
 
-          LOG.info("Normal delay: {}, Step: {}, {}", normalDelayUs, burstyN, incStepN);
+          LOG.info("Normal delay: {}, Step: {}, {}, [{}-{}]", normalDelayUs, burstyN, incStepN, burstyStartStep, burstyEndStep);
           return interEventDelayUs;
         }
       }

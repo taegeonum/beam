@@ -216,7 +216,8 @@ public class NexmarkUtils {
   public enum RateShape {
     SQUARE,
     SINE,
-    BURSTY;
+    BURSTY,
+    INC_BURSTY;
 
     /** Number of steps used to approximate sine wave. */
     private static final int N = 10;
@@ -237,7 +238,7 @@ public class NexmarkUtils {
      * numGenerators}.
      */
     public long[] interEventDelayUs(int firstRate, int nextRate, RateUnit unit, int numGenerators,
-                                    int burstyN) {
+                                    int burstyN, int incStepN) {
       if (firstRate == nextRate) {
         long[] interEventDelayUs = new long[1];
         interEventDelayUs[0] = unit.rateToPeriodUs(firstRate) * numGenerators;
@@ -283,6 +284,28 @@ public class NexmarkUtils {
           LOG.info("Normal delay: {}, Bursty delay: {}", normalDelayUs, burstyDelayUS);
           return interEventDelayUs;
         }
+        case INC_BURSTY:
+        {
+          final int totalStep = burstyN * incStepN;
+          final int ratePerStep = (nextRate - firstRate) / incStepN;
+          final int burstyStartStep = totalStep / 2 - (incStepN / 2);
+          final int burstyEndStep = burstyStartStep + incStepN;
+          final long normalDelayUs = unit.rateToPeriodUs(firstRate) * numGenerators;
+
+          int burstyCnt = 1;
+          long[] interEventDelayUs = new long[totalStep];
+          for (int i = 0; i < totalStep; i++) {
+            if (i >= burstyStartStep && i < burstyEndStep) {
+              interEventDelayUs[i] = unit.rateToPeriodUs(firstRate + ratePerStep * burstyCnt) * numGenerators;
+              burstyCnt += 1;
+            } else {
+              interEventDelayUs[i] = normalDelayUs;
+            }
+          }
+
+          LOG.info("Normal delay: {}, Step: {}, {}", normalDelayUs, burstyN, incStepN);
+          return interEventDelayUs;
+        }
       }
       throw new RuntimeException(); // switch should be exhaustive
     }
@@ -292,7 +315,8 @@ public class NexmarkUtils {
      * cycle through the entire sequence every {@code ratePeriodSec}.
      */
     public int stepLengthSec(int ratePeriodSec,
-                             int burstyN) {
+                             int burstyN,
+                             int incStepN) {
       int n = 0;
       switch (this) {
         case SQUARE:
@@ -304,6 +328,8 @@ public class NexmarkUtils {
         case BURSTY:
           n = burstyN;
           break;
+        case INC_BURSTY:
+          n = burstyN * incStepN;
       }
       return (ratePeriodSec + n - 1) / n;
     }

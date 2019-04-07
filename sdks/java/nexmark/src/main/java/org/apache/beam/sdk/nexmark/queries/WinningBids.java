@@ -313,7 +313,7 @@ public class WinningBids extends PTransform<PCollection<Event>, PCollection<Auct
     long[] interEventDelayUs =
         configuration.rateShape.interEventDelayUs(
             configuration.firstEventRate, configuration.nextEventRate,
-            configuration.rateUnit, configuration.numEventGenerators, configuration.burstyStep);
+            configuration.rateUnit, configuration.numEventGenerators, configuration.burstyStep, configuration.incStep);
     long longestDelayUs = 0;
     for (long interEventDelayU : interEventDelayUs) {
       longestDelayUs = Math.max(longestDelayUs, interEventDelayU);

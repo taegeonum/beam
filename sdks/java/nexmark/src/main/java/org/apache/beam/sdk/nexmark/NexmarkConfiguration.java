@@ -150,6 +150,7 @@ public class NexmarkConfiguration implements Serializable {
   @JsonProperty public int splitNum = 1;
 
   @JsonProperty public int burstyStep = 5;
+  @JsonProperty public int incStep = 5;
 
   /**
    * Extra data, in bytes, to save to persistent state for each event. This will force i/o all the
@@ -285,6 +286,9 @@ public class NexmarkConfiguration implements Serializable {
     if (options.getBurstyStep() != null) {
       burstyStep = options.getBurstyStep();
     }
+    if (options.getBurstyStep() != null) {
+      incStep = options.getIncStep();
+    }
     if (options.getSplitNum() != null) {
       splitNum = options.getSplitNum();
     }
@@ -353,6 +357,7 @@ public class NexmarkConfiguration implements Serializable {
     result.cpuDelayMs = cpuDelayMs;
     result.samplingRate = samplingRate;
     result.burstyStep = burstyStep;
+    result.incStep = incStep;
     result.splitNum = splitNum;
     result.diskBusyBytes = diskBusyBytes;
     result.auctionSkip = auctionSkip;
@@ -464,6 +469,9 @@ public class NexmarkConfiguration implements Serializable {
     if (burstyStep != DEFAULT.burstyStep) {
       sb.append(String.format("; burstyStep:%d", burstyStep));
     }
+    if (incStep != DEFAULT.incStep) {
+      sb.append(String.format("; incStep:%d", incStep));
+    }
     if (splitNum != DEFAULT.splitNum) {
       sb.append(String.format("; splitNum:%d", splitNum));
     }
@@ -551,6 +559,7 @@ public class NexmarkConfiguration implements Serializable {
         cpuDelayMs,
         samplingRate,
         burstyStep,
+        incStep,
         splitNum,
         diskBusyBytes,
         auctionSkip,
@@ -600,6 +609,9 @@ public class NexmarkConfiguration implements Serializable {
       return false;
     }
     if (burstyStep != other.burstyStep) {
+      return false;
+    }
+    if (incStep != other.incStep) {
       return false;
     }
     if (splitNum != other.splitNum) {

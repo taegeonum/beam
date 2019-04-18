@@ -356,8 +356,10 @@ public class NexmarkUtils {
           break;
         case INC_BURSTY:
           n = burstyN * incStepN;
+          break;
         case FLUCTUATION:
           n = FLUCT_N;
+          break;
       }
       return (ratePeriodSec + n - 1) / n;
     }

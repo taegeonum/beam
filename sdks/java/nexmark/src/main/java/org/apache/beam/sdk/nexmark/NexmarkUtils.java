@@ -217,7 +217,10 @@ public class NexmarkUtils {
     SQUARE,
     SINE,
     BURSTY,
-    INC_BURSTY;
+    INC_BURSTY,
+    FLUCTUATION;
+
+    private static final int FLUCT_N = 53;
 
     /** Number of steps used to approximate sine wave. */
     private static final int N = 10;
@@ -307,6 +310,28 @@ public class NexmarkUtils {
           LOG.info("Normal delay: {}, Step: {}, {}, [{}-{}]", normalDelayUs, burstyN, incStepN, burstyStartStep, burstyEndStep);
           return interEventDelayUs;
         }
+        case FLUCTUATION:
+        {
+            // assuming 530 seconds
+          final int[] bursties = {3,7,5,9,5,10,3,5};
+
+          final long normalDelayUs = unit.rateToPeriodUs(firstRate) * numGenerators;
+          long[] interEventDelayUs = new long[FLUCT_N];
+          for (int i = 0; i < FLUCT_N; i++) {
+            if (i % 6 == 5) {
+              final int burstyIndex = i / 6;
+              final int burstyTime = bursties[burstyIndex];
+              final long burstyDelayUS = unit.rateToPeriodUs(firstRate * burstyTime) * numGenerators;
+              interEventDelayUs[i] = burstyDelayUS;
+              LOG.info("input rate: {} at {}", firstRate * burstyTime, i);
+            } else {
+              interEventDelayUs[i] = normalDelayUs;
+              LOG.info("input rate: {} at {}", firstRate, i);
+            }
+          }
+
+          return interEventDelayUs;
+        }
       }
       throw new RuntimeException(); // switch should be exhaustive
     }
@@ -331,6 +356,8 @@ public class NexmarkUtils {
           break;
         case INC_BURSTY:
           n = burstyN * incStepN;
+        case FLUCTUATION:
+          n = FLUCT_N;
       }
       return (ratePeriodSec + n - 1) / n;
     }

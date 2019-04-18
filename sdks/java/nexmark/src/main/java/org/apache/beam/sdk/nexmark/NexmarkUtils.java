@@ -312,6 +312,7 @@ public class NexmarkUtils {
         }
         case FLUCTUATION:
         {
+          LOG.info("Fluctuation!!");
             // assuming 530 seconds
           final int[] bursties = {3,7,5,9,5,10,3,5};
 

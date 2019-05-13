@@ -248,6 +248,7 @@ public class NexmarkUtils {
         return interEventDelayUs;
       }
 
+
       switch (this) {
         case SQUARE:
         {

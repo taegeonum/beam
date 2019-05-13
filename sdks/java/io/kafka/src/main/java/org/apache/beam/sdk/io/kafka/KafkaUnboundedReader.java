@@ -523,10 +523,11 @@ class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V>> {
     List<TopicPartition> partitions = source.getSpec().getTopicPartitions();
     List<PartitionState<K, V>> states = new ArrayList<>(partitions.size());
 
-    LOG.info("Partition size: {}, checkpointPartitionSize: {}", partitions.size(),
-            checkpointMark.getPartitions().size());
 
     if (checkpointMark != null) {
+      LOG.info("Partition size: {}, checkpointPartitionSize: {}", partitions.size(),
+              checkpointMark.getPartitions().size());
+
       checkState(
           checkpointMark.getPartitions().size() == partitions.size(),
           "checkPointMark and assignedPartitions should match");

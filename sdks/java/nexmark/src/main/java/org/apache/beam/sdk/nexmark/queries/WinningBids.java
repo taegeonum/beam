@@ -310,21 +310,21 @@ public class WinningBids extends PTransform<PCollection<Event>, PCollection<Auct
   public WinningBids(String name, NexmarkConfiguration configuration) {
     super(name);
     // What's the expected auction time (when the system is running at the lowest event rate).
-    long[] interEventDelayNs =
-        configuration.rateShape.interEventDelayNs(
+    long[] interEventDelayUs =
+        configuration.rateShape.interEventDelayUs(
             configuration.firstEventRate, configuration.nextEventRate,
             configuration.rateUnit, configuration.numEventGenerators, configuration.burstyStep, configuration.incStep);
-    long longestDelayNs = 0;
-    for (long interEventDelayN : interEventDelayNs) {
-      longestDelayNs = Math.max(longestDelayNs, interEventDelayN);
+    long longestDelayUs = 0;
+    for (long interEventDelayU : interEventDelayUs) {
+      longestDelayUs = Math.max(longestDelayUs, interEventDelayU);
     }
     // Adjust for proportion of auction events amongst all events.
-    longestDelayNs =
-        (longestDelayNs * GeneratorConfig.PROPORTION_DENOMINATOR)
+    longestDelayUs =
+        (longestDelayUs * GeneratorConfig.PROPORTION_DENOMINATOR)
             / GeneratorConfig.AUCTION_PROPORTION;
     // Adjust for number of in-flight auctions.
-    longestDelayNs = longestDelayNs * configuration.numInFlightAuctions;
-    long expectedAuctionDurationMs = (longestDelayNs + 999999) / 1000000;
+    longestDelayUs = longestDelayUs * configuration.numInFlightAuctions;
+    long expectedAuctionDurationMs = (longestDelayUs + 999) / 1000;
     NexmarkUtils.console("Expected auction duration is %d ms", expectedAuctionDurationMs);
     auctionOrBidWindowFn = new AuctionOrBidWindowFn(expectedAuctionDurationMs);
   }

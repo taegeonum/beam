@@ -53,7 +53,7 @@ public class GeneratorConfig implements Serializable {
    * Delay between events, in microseconds. If the array has more than one entry then the rate is
    * changed every {@link #stepLengthSec}, and wraps around.
    */
-  private final long[] interEventDelayNs;
+  private final long[] interEventDelayUs;
 
   /** Delay before changing the current inter-event delay. */
   private final long stepLengthSec;
@@ -95,8 +95,8 @@ public class GeneratorConfig implements Serializable {
       long maxEventsOrZero,
       long firstEventNumber) {
     this.configuration = configuration;
-    this.interEventDelayNs =
-        configuration.rateShape.interEventDelayNs(
+    this.interEventDelayUs =
+        configuration.rateShape.interEventDelayUs(
             configuration.firstEventRate, configuration.nextEventRate,
             configuration.rateUnit, configuration.numEventGenerators, configuration.burstyStep, configuration.incStep);
     this.stepLengthSec = configuration.rateShape.stepLengthSec(configuration.ratePeriodSec, configuration.burstyStep, configuration.incStep);
@@ -117,11 +117,11 @@ public class GeneratorConfig implements Serializable {
 
     long eventsPerEpoch = 0;
     long epochPeriodMs = 0;
-    if (interEventDelayNs.length > 1) {
-      for (long interEventDelayN : interEventDelayNs) {
-        long numEventsForThisCycle = (stepLengthSec * 1_000_000_000L) / interEventDelayN;
+    if (interEventDelayUs.length > 1) {
+      for (long interEventDelayU : interEventDelayUs) {
+        long numEventsForThisCycle = (stepLengthSec * 1_000_000L) / interEventDelayU;
         eventsPerEpoch += numEventsForThisCycle;
-        epochPeriodMs += (numEventsForThisCycle * interEventDelayN) / 1000000L;
+        epochPeriodMs += (numEventsForThisCycle * interEventDelayU) / 1000L;
       }
     }
     this.eventsPerEpoch = eventsPerEpoch;
@@ -268,24 +268,24 @@ public class GeneratorConfig implements Serializable {
    * inter-event delay (in microseconds) is current?
    */
   public KV<Long, Long> timestampAndInterEventDelayUsForEvent(long eventNumber) {
-    if (interEventDelayNs.length == 1) {
-      long timestamp = baseTime + (eventNumber * interEventDelayNs[0]) / 1000000L;
-      return KV.of(timestamp, interEventDelayNs[0]);
+    if (interEventDelayUs.length == 1) {
+      long timestamp = baseTime + (eventNumber * interEventDelayUs[0]) / 1000L;
+      return KV.of(timestamp, interEventDelayUs[0]);
     }
 
     long epoch = eventNumber / eventsPerEpoch;
     long n = eventNumber % eventsPerEpoch;
     long offsetInEpochMs = 0;
-    for (long interEventDelayU : interEventDelayNs) {
-      long numEventsForThisCycle = (stepLengthSec * 1_000_000_000L) / interEventDelayU;
+    for (long interEventDelayU : interEventDelayUs) {
+      long numEventsForThisCycle = (stepLengthSec * 1_000_000L) / interEventDelayU;
       if (n < numEventsForThisCycle) {
         long offsetInCycleUs = n * interEventDelayU;
         long timestamp =
-            baseTime + epoch * epochPeriodMs + offsetInEpochMs + (offsetInCycleUs / 1000000L);
+            baseTime + epoch * epochPeriodMs + offsetInEpochMs + (offsetInCycleUs / 1000L);
         return KV.of(timestamp, interEventDelayU);
       }
       n -= numEventsForThisCycle;
-      offsetInEpochMs += (numEventsForThisCycle * interEventDelayU) / 1000000L;
+      offsetInEpochMs += (numEventsForThisCycle * interEventDelayU) / 1000L;
     }
     throw new RuntimeException("internal eventsPerEpoch incorrect"); // can't reach
   }
@@ -297,11 +297,11 @@ public class GeneratorConfig implements Serializable {
     sb.append("{configuration:");
     sb.append(configuration.toString());
     sb.append(";interEventDelayUs=[");
-    for (int i = 0; i < interEventDelayNs.length; i++) {
+    for (int i = 0; i < interEventDelayUs.length; i++) {
       if (i > 0) {
         sb.append(",");
       }
-      sb.append(interEventDelayNs[i]);
+      sb.append(interEventDelayUs[i]);
     }
     sb.append("]");
     sb.append(";stepLengthSec:");

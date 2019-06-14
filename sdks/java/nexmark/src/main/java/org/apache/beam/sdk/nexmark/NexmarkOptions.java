@@ -316,6 +316,7 @@ public interface NexmarkOptions
   void setSplitNum(Integer splitNum);
 
   @Nullable
+  @Default.Double(1.0)
   Double getSamplingRate();
   void setSamplingRate(Double samplingRate);
 

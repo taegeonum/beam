@@ -554,6 +554,8 @@ public class NexmarkUtils {
           @ProcessElement
           public void processElement(ProcessContext c) {
             if (random.nextDouble() <= samplingRate) {
+              final long curr = System.currentTimeMillis();
+              LOG.info("Latency: {}", c.timestamp().getMillis() - curr);
               c.output(c.element());
             }
           }

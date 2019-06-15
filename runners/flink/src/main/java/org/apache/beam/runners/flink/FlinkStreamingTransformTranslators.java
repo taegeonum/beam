@@ -203,7 +203,7 @@ class FlinkStreamingTransformTranslators {
                 fullName,
                 context.getPipelineOptions(),
                 rawSource,
-                context.getExecutionEnvironment().getParallelism());
+                context.getExecutionEnvironment().getMaxParallelism());
         nonDedupSource =
             context
                 .getExecutionEnvironment()

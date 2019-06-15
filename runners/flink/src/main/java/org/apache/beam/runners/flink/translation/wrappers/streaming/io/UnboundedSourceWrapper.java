@@ -148,6 +148,8 @@ public class UnboundedSourceWrapper<OutputT, CheckpointMarkT extends UnboundedSo
     // this is necessary so that the mapping of state to source is correct
     // when restoring
     splitSources = source.split(parallelism, pipelineOptions);
+
+    LOG.info("split sources size {}, parallelism: {}", splitSources.size(), parallelism);
   }
 
   /** Initialize and restore state before starting execution of the source. */
@@ -194,6 +196,8 @@ public class UnboundedSourceWrapper<OutputT, CheckpointMarkT extends UnboundedSo
 
   @Override
   public void run(SourceContext<WindowedValue<ValueWithRecordId<OutputT>>> ctx) throws Exception {
+
+      LOG.info("LocalReaders size: {}", localReaders.size());
 
     context = ctx;
 

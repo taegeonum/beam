@@ -66,6 +66,11 @@ public interface FlinkPipelineOptions
 
   void setParallelism(Integer value);
 
+  @Default.InstanceFactory(DefaultParallelismFactory.class)
+  Integer getMaxParallelism();
+
+  void setMaxParallelism(Integer value);
+
   @Description(
       "The interval between consecutive checkpoints (i.e. snapshots of the current"
           + "pipeline state used for fault tolerance).")

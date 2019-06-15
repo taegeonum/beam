@@ -116,6 +116,11 @@ public class FlinkExecutionEnvironments {
       flinkStreamEnv.setParallelism(options.getParallelism());
     }
 
+    if (options.getMaxParallelism() != -1) {
+      LOG.info("Set max parallelism to {}", options.getMaxParallelism());
+      flinkStreamEnv.setMaxParallelism(options.getMaxParallelism());
+    }
+
     // set parallelism in the options (required by some execution code)
     options.setParallelism(flinkStreamEnv.getParallelism());
 

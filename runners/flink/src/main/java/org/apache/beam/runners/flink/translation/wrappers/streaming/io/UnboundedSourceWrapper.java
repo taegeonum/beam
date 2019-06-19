@@ -200,7 +200,7 @@ public class UnboundedSourceWrapper<OutputT, CheckpointMarkT extends UnboundedSo
   @Override
   public void run(SourceContext<WindowedValue<ValueWithRecordId<OutputT>>> ctx) throws Exception {
 
-      LOG.info("LocalReaders size: {}", localReaders.size());
+      //LOG.info("LocalReaders size: {}", localReaders.size());
 
     context = ctx;
 

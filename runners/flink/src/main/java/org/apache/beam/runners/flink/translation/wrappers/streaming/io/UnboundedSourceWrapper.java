@@ -24,8 +24,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.beam.runners.core.construction.SerializablePipelineOptions;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
@@ -228,33 +226,17 @@ public class UnboundedSourceWrapper<OutputT, CheckpointMarkT extends UnboundedSo
 
       setNextWatermarkTimer(this.runtimeContext);
 
-      final ScheduledExecutorService se = Executors.newSingleThreadScheduledExecutor();
-      final AtomicInteger cnt = new AtomicInteger(0);
-      final AtomicInteger missCnt = new AtomicInteger(0);
-
-      se.scheduleAtFixedRate(() -> {
-        final int d = cnt.get();
-        final int dd = missCnt.get();
-        cnt.addAndGet(-d);
-        missCnt.addAndGet(-dd);
-          LOG.info("Emit cnt: {}, miss cnt: {}", d, dd);
-      }, 1, 1, TimeUnit.SECONDS);
-
       while (isRunning) {
         boolean dataAvailable;
-        //synchronized (ctx.getCheckpointLock()) {
+        synchronized (ctx.getCheckpointLock()) {
           dataAvailable = readerInvoker.invokeAdvance(reader);
 
           if (dataAvailable) {
-              cnt.getAndIncrement();
-            //LOG.info("Emit element {}");
             emitElement(ctx, reader);
           }
-        //}
-
+        }
         if (!dataAvailable) {
-            missCnt.incrementAndGet();
-          Thread.sleep(10);
+          Thread.sleep(50);
         }
       }
     } else {
@@ -266,12 +248,12 @@ public class UnboundedSourceWrapper<OutputT, CheckpointMarkT extends UnboundedSo
 
       // start each reader and emit data if immediately available
       for (UnboundedSource.UnboundedReader<OutputT> reader : localReaders) {
-        //synchronized (ctx.getCheckpointLock()) {
+        synchronized (ctx.getCheckpointLock()) {
           boolean dataAvailable = readerInvoker.invokeStart(reader);
           if (dataAvailable) {
             emitElement(ctx, reader);
           }
-        //}
+        }
       }
 
       setNextWatermarkTimer(this.runtimeContext);
@@ -282,13 +264,13 @@ public class UnboundedSourceWrapper<OutputT, CheckpointMarkT extends UnboundedSo
       while (isRunning) {
         UnboundedSource.UnboundedReader<OutputT> reader = localReaders.get(currentReader);
 
-        //synchronized (ctx.getCheckpointLock()) {
+        synchronized (ctx.getCheckpointLock()) {
           boolean dataAvailable = readerInvoker.invokeAdvance(reader);
           if (dataAvailable) {
             emitElement(ctx, reader);
             hadData = true;
           }
-        //}
+        }
 
         currentReader = (currentReader + 1) % numReaders;
         if (currentReader == 0 && !hadData) {

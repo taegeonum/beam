@@ -22,6 +22,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.beam.runners.core.construction.SerializablePipelineOptions;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.metrics.FlinkMetricContainer;
@@ -202,6 +207,7 @@ public class UnboundedSourceWrapper<OutputT, CheckpointMarkT extends UnboundedSo
 
       //LOG.info("LocalReaders size: {}", localReaders.size());
 
+
     context = ctx;
 
     FlinkMetricContainer metricContainer = new FlinkMetricContainer(getRuntimeContext());
@@ -222,12 +228,24 @@ public class UnboundedSourceWrapper<OutputT, CheckpointMarkT extends UnboundedSo
 
       setNextWatermarkTimer(this.runtimeContext);
 
+      final ScheduledExecutorService se = Executors.newSingleThreadScheduledExecutor();
+      final AtomicInteger cnt = new AtomicInteger(0);
+
+      se.scheduleAtFixedRate(() -> {
+        final int d = cnt.get();
+        cnt.addAndGet(-d);
+          LOG.info("Emit cnt: {}", d);
+      }, 1, 1, TimeUnit.SECONDS);
+
+      long prevEmitTime = System.currentTimeMillis();
+
       while (isRunning) {
         boolean dataAvailable;
         //synchronized (ctx.getCheckpointLock()) {
           dataAvailable = readerInvoker.invokeAdvance(reader);
 
           if (dataAvailable) {
+              cnt.getAndIncrement();
             //LOG.info("Emit element {}");
             emitElement(ctx, reader);
           }

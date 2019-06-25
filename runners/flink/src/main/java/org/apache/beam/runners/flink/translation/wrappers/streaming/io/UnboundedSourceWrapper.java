@@ -230,14 +230,15 @@ public class UnboundedSourceWrapper<OutputT, CheckpointMarkT extends UnboundedSo
 
       final ScheduledExecutorService se = Executors.newSingleThreadScheduledExecutor();
       final AtomicInteger cnt = new AtomicInteger(0);
+      final AtomicInteger missCnt = new AtomicInteger(0);
 
       se.scheduleAtFixedRate(() -> {
         final int d = cnt.get();
+        final int dd = missCnt.get();
         cnt.addAndGet(-d);
-          LOG.info("Emit cnt: {}", d);
+        missCnt.addAndGet(-dd);
+          LOG.info("Emit cnt: {}, miss cnt: {}", d, dd);
       }, 1, 1, TimeUnit.SECONDS);
-
-      long prevEmitTime = System.currentTimeMillis();
 
       while (isRunning) {
         boolean dataAvailable;
@@ -250,8 +251,10 @@ public class UnboundedSourceWrapper<OutputT, CheckpointMarkT extends UnboundedSo
             emitElement(ctx, reader);
           }
         //}
+
         if (!dataAvailable) {
-          Thread.sleep(50);
+            missCnt.incrementAndGet();
+          Thread.sleep(10);
         }
       }
     } else {

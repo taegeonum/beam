@@ -550,14 +550,17 @@ public class NexmarkUtils {
      return ParDo.of(
         new DoFn<T, T>() {
            final Random random = new Random();
+           int cnt = 0;
 
           @ProcessElement
           public void processElement(ProcessContext c) {
+              cnt += 1;
             if (random.nextDouble() <= samplingRate) {
               final long curr = System.currentTimeMillis();
               final long ltc = curr - c.timestamp().getMillis();
-              LOG.info("ltc: {} elem: {}: ", ltc, c.element());
+              LOG.info("ltc: {} processed cnt: {},  elem: {}: ", ltc, cnt, c.element());
               LOG.info("Latency: {}", ltc);
+              cnt = 0;
               c.output(c.element());
             }
           }

@@ -558,7 +558,8 @@ public class NexmarkUtils {
             if (random.nextDouble() <= samplingRate) {
               final long curr = System.currentTimeMillis();
               final long ltc = curr - c.timestamp().getMillis();
-              LOG.info("ltc: {} processed cnt: {},  elem: {}: ", ltc, cnt, c.element());
+              LOG.info("ltc: {} processed cnt: {}, instance: {} elem: {}: ", ltc, cnt,
+                      this.hashCode(), c.element());
               LOG.info("Latency: {}", ltc);
               cnt = 0;
               c.output(c.element());

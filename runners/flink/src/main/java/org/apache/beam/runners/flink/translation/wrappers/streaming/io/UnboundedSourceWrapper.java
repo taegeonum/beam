@@ -18,10 +18,8 @@
 package org.apache.beam.runners.flink.translation.wrappers.streaming.io;
 
 import com.google.common.annotations.VisibleForTesting;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
+
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -313,6 +311,8 @@ public class UnboundedSourceWrapper<OutputT, CheckpointMarkT extends UnboundedSo
 
   int cnt = 0;
   long prevLogTime = System.currentTimeMillis();
+  final Random random = new Random();
+  final double samplingRate = 0.0001;
 
   /** Emit the current element from the given Reader. The reader is guaranteed to have data. */
   private void emitElement(
@@ -341,6 +341,12 @@ public class UnboundedSourceWrapper<OutputT, CheckpointMarkT extends UnboundedSo
       LOG.info("Thp: {} at {}", thp, this.hashCode());
       cnt = 0;
       prevLogTime = currTime;
+    }
+
+    if (random.nextDouble() <= samplingRate) {
+      final long curr = System.currentTimeMillis();
+      final long ltc = curr - timestamp.getMillis();
+      LOG.info("Latency: {}", ltc);
     }
   }
 

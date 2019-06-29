@@ -549,12 +549,15 @@ public class NexmarkUtils {
   public static <T> ParDo.SingleOutput<T, T> sampling(final String name, final double samplingRate) {
      return ParDo.of(
         new DoFn<T, T>() {
-           final Random random = new Random();
-           int processedCnt = 0;
-           long prevLogTime = 0;
+           //final Random random = new Random();
+           //int processedCnt = 0;
+           //long prevLogTime = 0;
 
           @ProcessElement
           public void processElement(ProcessContext c) {
+            c.output(c.element());
+
+            /*
             processedCnt += 1;
 
             final long currtime = System.currentTimeMillis();
@@ -574,6 +577,7 @@ public class NexmarkUtils {
               processedCnt = 0;
               c.output(c.element());
             }
+            */
           }
         });
   }

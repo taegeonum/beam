@@ -311,6 +311,9 @@ public class UnboundedSourceWrapper<OutputT, CheckpointMarkT extends UnboundedSo
     }
   }
 
+  int cnt = 0;
+  long prevLogTime = System.currentTimeMillis();
+
   /** Emit the current element from the given Reader. The reader is guaranteed to have data. */
   private void emitElement(
       SourceContext<WindowedValue<ValueWithRecordId<OutputT>>> ctx,
@@ -328,6 +331,17 @@ public class UnboundedSourceWrapper<OutputT, CheckpointMarkT extends UnboundedSo
             GlobalWindow.INSTANCE,
             PaneInfo.NO_FIRING);
     ctx.collectWithTimestamp(windowedValue, timestamp.getMillis());
+
+    cnt += 1;
+
+    final long currTime = System.currentTimeMillis();
+
+    if (currTime - prevLogTime >= 1000) {
+      final long thp = 1000 * cnt / (currTime - prevLogTime);
+      LOG.info("Thp: {} at {}", thp, this.hashCode());
+      cnt = 0;
+      prevLogTime = currTime;
+    }
   }
 
   @Override

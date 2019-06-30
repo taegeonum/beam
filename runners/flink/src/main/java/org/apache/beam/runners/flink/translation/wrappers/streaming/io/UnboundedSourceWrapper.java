@@ -119,6 +119,8 @@ public class UnboundedSourceWrapper<OutputT, CheckpointMarkT extends UnboundedSo
   /** false if checkpointCoder is null or no restore state by starting first. */
   private transient boolean isRestored = false;
 
+  private final double samplingRate;
+
   @SuppressWarnings("unchecked")
   public UnboundedSourceWrapper(
       String stepName,
@@ -128,6 +130,10 @@ public class UnboundedSourceWrapper<OutputT, CheckpointMarkT extends UnboundedSo
       throws Exception {
     this.stepName = stepName;
     this.serializedOptions = new SerializablePipelineOptions(pipelineOptions);
+
+    this.samplingRate = ((FlinkPipelineOptions) pipelineOptions).getSourceSamplingRate();
+
+    LOG.info("Flink source sampling rate: {}", samplingRate);
 
     if (source.requiresDeduping()) {
       LOG.warn("Source {} requires deduping but Flink runner doesn't support this yet.", source);
@@ -312,7 +318,6 @@ public class UnboundedSourceWrapper<OutputT, CheckpointMarkT extends UnboundedSo
   int cnt = 0;
   long prevLogTime = System.currentTimeMillis();
   final Random random = new Random();
-  final double samplingRate = 0.0001;
 
   /** Emit the current element from the given Reader. The reader is guaranteed to have data. */
   private void emitElement(

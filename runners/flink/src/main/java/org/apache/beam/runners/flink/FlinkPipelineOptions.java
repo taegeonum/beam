@@ -71,6 +71,11 @@ public interface FlinkPipelineOptions
 
   void setMaxParallelism(Integer value);
 
+  @Default.Double(1.0)
+  Double getSourceSamplingRate();
+
+  void setSourceSamplingRate(Double value);
+
   @Description(
       "The interval between consecutive checkpoints (i.e. snapshots of the current"
           + "pipeline state used for fault tolerance).")

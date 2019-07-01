@@ -577,15 +577,16 @@ public class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V
     backlogElementsOfSplit = SourceMetrics.backlogElementsOfSplit(splitId);
   }
 
+  ConsumerRecords<byte[], byte[]> pollingRecords = ConsumerRecords.empty();
+
   @Override
   public void pollRecord(final long timeout) {
-    ConsumerRecords<byte[], byte[]> records = ConsumerRecords.empty();
     try {
-      if (records.isEmpty()) {
-        records = consumer.poll(timeout);
+      if (pollingRecords.isEmpty()) {
+        pollingRecords = consumer.poll(timeout);
       } else if (availableRecordsQueue.offer(
-              records, RECORDS_ENQUEUE_POLL_TIMEOUT.getMillis(), TimeUnit.MILLISECONDS)) {
-        records = ConsumerRecords.empty();
+              pollingRecords, RECORDS_ENQUEUE_POLL_TIMEOUT.getMillis(), TimeUnit.MILLISECONDS)) {
+        pollingRecords = ConsumerRecords.empty();
       }
       KafkaCheckpointMark checkpointMark = finalizedCheckpointMark.getAndSet(null);
       if (checkpointMark != null) {

@@ -575,18 +575,18 @@ public class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V
 
         if (!pollingRecords.isEmpty()) {
           availableRecordsQueue.offer(pollingRecords);
-          LOG.info("Records after polling: {}, queueSize: {}", pollingRecords, availableRecordsQueue.size());
+          //LOG.info("Records after polling: {}, queueSize: {}", pollingRecords, availableRecordsQueue.size());
         }
 
         pollingRecords = ConsumerRecords.empty();
       } else if (availableRecordsQueue.offer(
               pollingRecords)) {
 
-        LOG.info("Add records: {}", pollingRecords);
+        //LOG.info("Add records: {}", pollingRecords);
         pollingRecords = ConsumerRecords.empty();
       }
 
-      LOG.info("Polling records: {}", pollingRecords);
+      //LOG.info("Polling records: {}", pollingRecords);
 
       KafkaCheckpointMark checkpointMark = finalizedCheckpointMark.getAndSet(null);
       if (checkpointMark != null) {

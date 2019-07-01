@@ -592,6 +592,9 @@ public class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V
         LOG.info("Add records: {}", pollingRecords);
         pollingRecords = ConsumerRecords.empty();
       }
+
+      LOG.info("Polling records: {}", pollingRecords);
+
       KafkaCheckpointMark checkpointMark = finalizedCheckpointMark.getAndSet(null);
       if (checkpointMark != null) {
         commitCheckpointMark(checkpointMark);

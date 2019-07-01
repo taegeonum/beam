@@ -584,9 +584,9 @@ public class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V
       if (pollingRecords.isEmpty()) {
         pollingRecords = consumer.poll(timeout);
         availableRecordsQueue.offer(pollingRecords);
-        pollingRecords = ConsumerRecords.empty();
+        LOG.info("Records after polling: {}, queueSize: {}", pollingRecords, availableRecordsQueue.size());
 
-        LOG.info("Records after polling: {}", pollingRecords);
+        pollingRecords = ConsumerRecords.empty();
       } else if (availableRecordsQueue.offer(
               pollingRecords)) {
 

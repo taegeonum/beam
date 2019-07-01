@@ -166,6 +166,10 @@ public abstract class UnboundedSource<
     @Override
     public abstract boolean start() throws IOException;
 
+    public void pollRecord(final long timeout) {
+      // do nothing
+    }
+
     /**
      * Advances the reader to the next valid record.
      *

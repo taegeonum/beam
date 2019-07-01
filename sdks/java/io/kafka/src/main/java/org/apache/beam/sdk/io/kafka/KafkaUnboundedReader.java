@@ -72,7 +72,7 @@ import org.slf4j.LoggerFactory;
  * An unbounded reader to read from Kafka. Each reader consumes messages from one or more Kafka
  * partitions. See {@link KafkaIO} for user visible documentation and example usage.
  */
-class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V>> {
+public class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V>> {
 
   ///////////////////// Reader API ////////////////////////////////////////////////////////////
   @SuppressWarnings("FutureReturnValueIgnored")
@@ -103,8 +103,11 @@ class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V>> {
     // Unfortunately it can block forever in case of network issues like incorrect ACLs.
     // Initialize partition in a separate thread and cancel it if takes longer than a minute.
     for (final PartitionState pState : partitionStates) {
-      Future<?> future = consumerPollThread.submit(() -> setupInitialOffset(pState));
 
+      setupInitialOffset(pState);
+      //Future<?> future = consumerPollThread.submit(() -> setupInitialOffset(pState));
+
+      /*
       try {
         // Timeout : 1 minute OR 2 * Kafka consumer request timeout if it is set.
         Integer reqTimeout =
@@ -128,6 +131,7 @@ class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V>> {
       } catch (Exception e) {
         throw new IOException(e);
       }
+      */
       LOG.info(
           "{}: reading from {} starting at offset {}",
           name,
@@ -137,7 +141,7 @@ class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V>> {
 
     // Start consumer read loop.
     // Note that consumer is not thread safe, should not be accessed out side consumerPollLoop().
-    consumerPollThread.submit(this::consumerPollLoop);
+    //consumerPollThread.submit(this::consumerPollLoop);
 
     // offsetConsumer setup :
 
@@ -375,7 +379,8 @@ class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V>> {
   // network I/O inside poll(). Polling only inside #advance(), especially with a small timeout
   // like 100 milliseconds does not work well. This along with large receive buffer for
   // consumer achieved best throughput in tests (see `defaultConsumerProperties`).
-  private final ExecutorService consumerPollThread = Executors.newSingleThreadExecutor();
+ // private final ExecutorService consumerPollThread = Executors.newSingleThreadExecutor();
+
   private final SynchronousQueue<ConsumerRecords<byte[], byte[]>> availableRecordsQueue =
       new SynchronousQueue<>();
   private AtomicReference<KafkaCheckpointMark> finalizedCheckpointMark = new AtomicReference<>();
@@ -572,6 +577,26 @@ class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V>> {
     backlogElementsOfSplit = SourceMetrics.backlogElementsOfSplit(splitId);
   }
 
+  @Override
+  public void pollRecord(final long timeout) {
+    ConsumerRecords<byte[], byte[]> records = ConsumerRecords.empty();
+    try {
+      if (records.isEmpty()) {
+        records = consumer.poll(timeout);
+      } else if (availableRecordsQueue.offer(
+              records, RECORDS_ENQUEUE_POLL_TIMEOUT.getMillis(), TimeUnit.MILLISECONDS)) {
+        records = ConsumerRecords.empty();
+      }
+      KafkaCheckpointMark checkpointMark = finalizedCheckpointMark.getAndSet(null);
+      if (checkpointMark != null) {
+        commitCheckpointMark(checkpointMark);
+      }
+    } catch (InterruptedException e) {
+      LOG.warn("{}: consumer thread is interrupted", this, e); // not expected
+    } catch (WakeupException e) {
+    }
+  }
+
   private void consumerPollLoop() {
     // Read in a loop and enqueue the batch of records, if any, to availableRecordsQueue.
 
@@ -728,7 +753,7 @@ class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V>> {
   @Override
   public void close() throws IOException {
     closed.set(true);
-    consumerPollThread.shutdown();
+    //consumerPollThread.shutdown();
     offsetFetcherThread.shutdown();
 
     boolean isShutdown = false;
@@ -744,6 +769,8 @@ class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V>> {
         offsetConsumer.wakeup();
       }
       availableRecordsQueue.poll(); // drain unread batch, this unblocks consumer thread.
+
+      /*
       try {
         isShutdown =
             consumerPollThread.awaitTermination(10, TimeUnit.SECONDS)
@@ -756,6 +783,7 @@ class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V>> {
       if (!isShutdown) {
         LOG.warn("An internal thread is taking a long time to shutdown. will retry.");
       }
+      */
     }
 
     Closeables.close(keyDeserializerInstance, true);

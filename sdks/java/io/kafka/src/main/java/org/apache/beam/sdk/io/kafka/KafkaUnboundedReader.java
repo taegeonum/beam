@@ -579,15 +579,14 @@ public class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V
 
   ConsumerRecords<byte[], byte[]> pollingRecords = ConsumerRecords.empty();
 
-  @Override
-  public void pollRecord(final long timeout) {
+  public void pollRecord(final long timeout, final long timeout2) {
     LOG.info("Hahahahaha");
     try {
       if (pollingRecords.isEmpty()) {
         pollingRecords = consumer.poll(timeout);
         LOG.info("Records after polling: {}", pollingRecords);
       } else if (availableRecordsQueue.offer(
-              pollingRecords, RECORDS_ENQUEUE_POLL_TIMEOUT.getMillis(), TimeUnit.MILLISECONDS)) {
+              pollingRecords, timeout2, TimeUnit.MILLISECONDS)) {
 
         LOG.info("Add records: {}", pollingRecords);
         pollingRecords = ConsumerRecords.empty();

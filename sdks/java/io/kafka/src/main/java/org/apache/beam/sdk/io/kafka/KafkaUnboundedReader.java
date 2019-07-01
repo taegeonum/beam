@@ -584,8 +584,11 @@ public class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V
     try {
       if (pollingRecords.isEmpty()) {
         pollingRecords = consumer.poll(timeout);
+        LOG.info("Records after polling: {}", pollingRecords);
       } else if (availableRecordsQueue.offer(
               pollingRecords, RECORDS_ENQUEUE_POLL_TIMEOUT.getMillis(), TimeUnit.MILLISECONDS)) {
+
+        LOG.info("Add records: {}", pollingRecords);
         pollingRecords = ConsumerRecords.empty();
       }
       KafkaCheckpointMark checkpointMark = finalizedCheckpointMark.getAndSet(null);

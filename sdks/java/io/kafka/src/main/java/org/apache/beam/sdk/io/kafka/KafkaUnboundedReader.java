@@ -580,13 +580,12 @@ public class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V
   ConsumerRecords<byte[], byte[]> pollingRecords = ConsumerRecords.empty();
 
   public void pollRecord(final long timeout, final long timeout2) {
-    LOG.info("Hahahahaha");
     try {
       if (pollingRecords.isEmpty()) {
         pollingRecords = consumer.poll(timeout);
         LOG.info("Records after polling: {}", pollingRecords);
       } else if (availableRecordsQueue.offer(
-              pollingRecords, timeout2, TimeUnit.MILLISECONDS)) {
+              pollingRecords)) {
 
         LOG.info("Add records: {}", pollingRecords);
         pollingRecords = ConsumerRecords.empty();
@@ -598,8 +597,6 @@ public class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V
       if (checkpointMark != null) {
         commitCheckpointMark(checkpointMark);
       }
-    } catch (InterruptedException e) {
-      LOG.warn("{}: consumer thread is interrupted", this, e); // not expected
     } catch (WakeupException e) {
     }
   }

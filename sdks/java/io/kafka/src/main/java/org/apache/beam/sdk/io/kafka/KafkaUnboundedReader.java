@@ -581,6 +581,7 @@ public class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V
 
   @Override
   public void pollRecord(final long timeout) {
+    LOG.info("Hahahahaha");
     try {
       if (pollingRecords.isEmpty()) {
         pollingRecords = consumer.poll(timeout);

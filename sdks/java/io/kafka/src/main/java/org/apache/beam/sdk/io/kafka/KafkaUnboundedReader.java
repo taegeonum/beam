@@ -24,23 +24,8 @@ import com.google.common.collect.Iterators;
 import com.google.common.io.Closeables;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -381,8 +366,12 @@ public class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V
   // consumer achieved best throughput in tests (see `defaultConsumerProperties`).
  // private final ExecutorService consumerPollThread = Executors.newSingleThreadExecutor();
 
-  private final SynchronousQueue<ConsumerRecords<byte[], byte[]>> availableRecordsQueue =
-      new SynchronousQueue<>();
+  //private final SynchronousQueue<ConsumerRecords<byte[], byte[]>> availableRecordsQueue =
+  //    new SynchronousQueue<>();
+
+  private final Queue<ConsumerRecords<byte[], byte[]>> availableRecordsQueue =
+          new ArrayDeque<>();
+
   private AtomicReference<KafkaCheckpointMark> finalizedCheckpointMark = new AtomicReference<>();
   private AtomicBoolean closed = new AtomicBoolean(false);
 
@@ -583,8 +572,11 @@ public class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V
     try {
       if (pollingRecords.isEmpty()) {
         pollingRecords = consumer.poll(timeout);
-        availableRecordsQueue.offer(pollingRecords);
-        LOG.info("Records after polling: {}, queueSize: {}", pollingRecords, availableRecordsQueue.size());
+
+        if (!pollingRecords.isEmpty()) {
+          availableRecordsQueue.offer(pollingRecords);
+          LOG.info("Records after polling: {}, queueSize: {}", pollingRecords, availableRecordsQueue.size());
+        }
 
         pollingRecords = ConsumerRecords.empty();
       } else if (availableRecordsQueue.offer(
@@ -604,6 +596,7 @@ public class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V
     }
   }
 
+  /*
   private void consumerPollLoop() {
     // Read in a loop and enqueue the batch of records, if any, to availableRecordsQueue.
 
@@ -630,6 +623,7 @@ public class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V
 
     LOG.info("{}: Returning from consumer pool loop", this);
   }
+  */
 
   private void commitCheckpointMark(KafkaCheckpointMark checkpointMark) {
     LOG.debug("{}: Committing finalized checkpoint {}", this, checkpointMark);
@@ -663,6 +657,8 @@ public class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V
     curBatch = Collections.emptyIterator();
 
     ConsumerRecords<byte[], byte[]> records;
+    records = availableRecordsQueue.poll();
+    /*
     try {
       // poll available records, wait (if necessary) up to the specified timeout.
       records =
@@ -673,6 +669,7 @@ public class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V
       LOG.warn("{}: Unexpected", this, e);
       return;
     }
+    */
 
     if (records == null) {
       return;

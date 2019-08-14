@@ -571,7 +571,9 @@ public class KafkaUnboundedReader<K, V> extends UnboundedReader<KafkaRecord<K, V
   public void pollRecord(final long timeout) {
     try {
       if (pollingRecords.isEmpty()) {
-        pollingRecords = consumer.poll(timeout);
+          synchronized (consumer) {
+            pollingRecords = consumer.poll(timeout);
+          }
 
         if (!pollingRecords.isEmpty()) {
           availableRecordsQueue.offer(pollingRecords);

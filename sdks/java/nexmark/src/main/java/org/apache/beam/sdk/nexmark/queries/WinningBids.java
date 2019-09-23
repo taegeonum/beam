@@ -382,16 +382,18 @@ public class WinningBids extends PTransform<PCollection<Event>, PCollection<Auct
                     for (Bid bid : c.element().getValue().getAll(NexmarkQuery.BID_TAG)) {
                       // Bids too late for their auction will have been
                       // filtered out by the window merge function.
-                      checkState(bid.dateTime < auction.expires);
-                      if (bid.price < auction.reserve) {
-                        // Bid price is below auction reserve.
-                        underReserveCounter.inc();
-                        continue;
-                      }
+                      if (bid.dateTime < auction.expires) {
+                        checkState(bid.dateTime < auction.expires);
+                        if (bid.price < auction.reserve) {
+                          // Bid price is below auction reserve.
+                          underReserveCounter.inc();
+                          continue;
+                        }
 
-                      if (bestBid == null
-                          || Bid.PRICE_THEN_DESCENDING_TIME.compare(bid, bestBid) > 0) {
-                        bestBid = bid;
+                        if (bestBid == null
+                                || Bid.PRICE_THEN_DESCENDING_TIME.compare(bid, bestBid) > 0) {
+                          bestBid = bid;
+                        }
                       }
                     }
                     if (bestBid == null) {

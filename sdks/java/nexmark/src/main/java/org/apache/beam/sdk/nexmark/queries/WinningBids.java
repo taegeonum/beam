@@ -104,7 +104,7 @@ public class WinningBids extends PTransform<PCollection<Event>, PCollection<Auct
 
     /** Return an auction window for {@code auction}. */
     public static AuctionOrBidWindow forAuction(Instant timestamp, Auction auction) {
-      return new AuctionOrBidWindow(timestamp, new Instant(auction.expires), auction.id, true);
+      return new AuctionOrBidWindow(new Instant(auction.dateTime), new Instant(auction.expires), auction.id, true);
     }
 
     /**
@@ -327,7 +327,7 @@ public class WinningBids extends PTransform<PCollection<Event>, PCollection<Auct
     long expectedAuctionDurationMs = (longestDelayUs + 999) / 1000;
 
     // TODO: remove
-    expectedAuctionDurationMs = 5000;
+    expectedAuctionDurationMs = 10000;
 
     NexmarkUtils.console("Expected auction duration is %d ms", expectedAuctionDurationMs);
     auctionOrBidWindowFn = new AuctionOrBidWindowFn(expectedAuctionDurationMs);

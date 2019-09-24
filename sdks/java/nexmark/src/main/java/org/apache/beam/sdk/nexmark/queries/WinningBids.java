@@ -328,7 +328,7 @@ public class WinningBids extends PTransform<PCollection<Event>, PCollection<Auct
     long expectedAuctionDurationMs = (longestDelayUs + 999) / 1000;
 
     // TODO: remove
-    expectedAuctionDurationMs = 1000;
+    expectedAuctionDurationMs = 1;
 
     NexmarkUtils.console("Expected auction duration is %d ms", expectedAuctionDurationMs);
     auctionOrBidWindowFn = new AuctionOrBidWindowFn(expectedAuctionDurationMs);

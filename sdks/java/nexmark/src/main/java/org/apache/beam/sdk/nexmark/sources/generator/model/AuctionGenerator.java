@@ -64,7 +64,7 @@ public class AuctionGenerator {
 
     long category = GeneratorConfig.FIRST_CATEGORY_ID + random.nextInt(NUM_CATEGORIES);
     long initialBid = nextPrice(random);
-    long expires = timestamp + nextAuctionLengthMs(eventsCountSoFar, random, timestamp, config);
+    long expires = timestamp + Math.min(5000, nextAuctionLengthMs(eventsCountSoFar, random, timestamp, config));
     String name = nextString(random, 20);
     String desc = nextString(random, 100);
     long reserve = initialBid + nextPrice(random);

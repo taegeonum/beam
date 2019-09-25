@@ -36,6 +36,8 @@ import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.joda.time.Duration;
 
+import java.util.Iterator;
+
 /**
  * Query 8, 'Monitor New Users'. Select people who have entered the system and created auctions in
  * the last 12 hours, updated every 12 hours. In CQL syntax:
@@ -82,7 +84,14 @@ public class Query8 extends NexmarkQuery {
                 new DoFn<KV<Long, CoGbkResult>, IdNameReserve>() {
                   @ProcessElement
                   public void processElement(ProcessContext c) {
-                    @Nullable Person person = c.element().getValue().getOnly(PERSON_TAG, null);
+                    Iterable<Person> persons = c.element().getValue().getAll(PERSON_TAG);
+
+                    Person person = null;
+
+                    if (persons.iterator().hasNext()) {
+                      person = persons.iterator().next();
+                    }
+
                     if (person == null) {
                       // Person was not created in last window period.
                       return;

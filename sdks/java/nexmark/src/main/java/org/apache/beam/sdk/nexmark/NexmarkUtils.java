@@ -292,7 +292,7 @@ public class NexmarkUtils {
         {
           final int totalStep = burstyN * incStepN;
           final int ratePerStep = (nextRate - firstRate) / incStepN;
-          final int burstyStartStep = totalStep / 2 - (incStepN / 2);
+          final int burstyStartStep = 0; //totalStep / 2 - (incStepN / 2);
           final int burstyEndStep = burstyStartStep + incStepN;
           final long normalDelayUs = unit.rateToPeriodUs(firstRate / numGenerators);
 

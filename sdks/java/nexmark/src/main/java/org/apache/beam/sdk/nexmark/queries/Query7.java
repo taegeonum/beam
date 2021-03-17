@@ -63,7 +63,7 @@ public class Query7 extends NexmarkQuery {
     // Find the largest price in all bids.
     // NOTE: It would be more efficient to write this query much as we did for Query5, using
     // a binary combiner to accumulate the bids with maximal price. As written this query
-    // requires an additional scan per window, with the associated cost of snapshotted state and
+    // requres an additional scan per window, with the associated cost of snapshotted state and
     // its I/O. We'll keep this implementation since it illustrates the use of side inputs.
     final PCollectionView<Long> maxPriceView =
         slidingBids

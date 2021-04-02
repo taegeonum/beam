@@ -290,10 +290,10 @@ public class NexmarkUtils {
         }
         case INC_BURSTY:
         {
-          final int totalStep = burstyN * incStepN;
+          final int totalStep = incStepN; // burstyN * incStepN;
           final int ratePerStep = (nextRate - firstRate) / incStepN;
           final int burstyStartStep = 0; //totalStep / 2 - (incStepN / 2);
-          final int burstyEndStep = burstyStartStep + incStepN;
+          final int burstyEndStep = totalStep; // burstyStartStep + incStepN;
           final long normalDelayUs = unit.rateToPeriodUs(firstRate / numGenerators);
 
           int burstyCnt = 1;
@@ -357,7 +357,7 @@ public class NexmarkUtils {
           n = burstyN;
           break;
         case INC_BURSTY:
-          n = burstyN * incStepN;
+          n = incStepN; // burstyN * incStepN;
           break;
         case FLUCTUATION:
           n = FLUCT_N;

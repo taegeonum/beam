@@ -286,7 +286,7 @@ public class NexmarkConfiguration implements Serializable {
     if (options.getBurstyStep() != null) {
       burstyStep = options.getBurstyStep();
     }
-    if (options.getBurstyStep() != null) {
+    if (options.getIncStep() != null) {
       incStep = options.getIncStep();
     }
     if (options.getSplitNum() != null) {

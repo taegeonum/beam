@@ -1335,7 +1335,7 @@ public class NexmarkLauncher<OptionT extends NexmarkOptions> {
         null,
         null,
         null,
-        new Query5Model(configuration));
+        new Query8Model(configuration));
   }
 
   private List<NexmarkQuery> createQueries() {
@@ -1369,7 +1369,7 @@ public class NexmarkLauncher<OptionT extends NexmarkOptions> {
         new Query10(configuration),
         new Query11(configuration),
         new Query12(configuration),
-        new Query5Fix(configuration));
+        new Query8SlidingWindow(configuration));
 
   }
 
